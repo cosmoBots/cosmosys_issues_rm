@@ -1,0 +1,6 @@
+- splitted_url = request.fullpath.split('/issues')
+- root_url = request.base_url+splitted_url[0]
+- issue_diagrams_content = "## Diagrams\n"+CosmosysIssuesBase.show_graphs(@issue,root_url)
+- if issue_diagrams_content.present?
+  .issue-content
+    = textilizable(issue_diagrams_content)

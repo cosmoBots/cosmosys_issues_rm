@@ -1,0 +1,3 @@
+= cosmosys_issues
+
+A plugin to convert a Redmine instance in a issues management cosmoSys Issue one

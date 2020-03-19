@@ -1,0 +1,18 @@
+custom_attributes:
+    BDID: ''
+    BDURL: ''
+    IssTitle: ''
+    IssParent: ''
+    IssRationale: ''
+    IssLevel: 'None'
+    IssType: 'Info'
+    IssSources: ''
+    IssChapter: ''
+    IssTarget: ''
+    IssValue: ''
+    IssVar: ''
+    IssStatus: ''
+    
+published_custom_attributes: ['BDID','BDURL','IssTitle','IssParent','IssueRationale','IssLevel','IssType','IssSources','IssChapter','IssTarget','IssValue','IssVar','IssStatus']
+custom_attr_format_string: '- **{}:** {}'
+required_version: 'NRT Doorstop v1.5.1'
