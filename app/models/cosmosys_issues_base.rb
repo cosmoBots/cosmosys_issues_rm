@@ -3,6 +3,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
   @@chapterdigits = 3
   @@cfchapter = IssueCustomField.find_by_name('IssChapter')
   @@cftitle = IssueCustomField.find_by_name('IssTitle')
+  @@cfsupervisor = IssueCustomField.find_by_name('Supervisor')
 
   def self.cfchapter
     @@cfchapter
@@ -20,14 +21,41 @@ class CosmosysIssuesBase < ActiveRecord::Base
     return result
   end
 
-  def self.create_json(current_issue, root_url, include_doc_children,currentdoc)
-    tree_node = current_issue.attributes.slice("id","tracker_id","subject","description","status_id","fixed_version_id","parent_id","root_id")
+  def self.create_json(current_issue, root_url, include_doc_children)
+    tree_node = current_issue.attributes.slice("id","tracker_id","subject","description","status_id","fixed_version_id","parent_id","root_id","assigned_to_id","due_date","start_date","done_ratio")
     tree_node[:chapter] = current_issue.custom_values.find_by_custom_field_id(@@cfchapter.id).value
+    tree_node[:title] = current_issue.custom_values.find_by_custom_field_id(@@cftitle.id).value
+    tree_node[:supervisor] = ""
+    if @@cfsupervisor != nil then
+      cvsupervisor = current_issue.custom_values.find_by_custom_field_id(@@cfsupervisor.id)
+      if cvsupervisor != nil then
+        tree_node[:supervisor_id] = cvsupervisor.value
+        if (cvsupervisor.value != nil) then
+          supervisor_id = cvsupervisor.value.to_i
+          if (supervisor_id > 0) then  
+            tree_node[:supervisor] = User.find(supervisor_id).login
+          end
+        end
+      end
+    end
+    tree_node[:assigned_to] = ""
+    if (current_issue.assigned_to != nil) then
+      tree_node[:assigned_to] = current_issue.assigned_to.login
+    end
+    if current_issue.children.size == 0 then
+      tree_node[:type] = 'Issue'
+    else
+      tree_node[:type] = 'Info'
+    end
+
     tree_node[:children] = []
 
     childrenitems = current_issue.children.sort_by {|obj| obj.custom_values.find_by_custom_field_id(@@cfchapter.id).value}
     childrenitems.each{|c|
-
+      if (include_doc_children) then
+        child_node = create_json(c,root_url,include_doc_children)
+        tree_node[:children] << child_node
+      end
     }
     tree_node[:relations] = []
     current_issue.relations_from.where(:relation_type => 'blocks').each{|rl|
@@ -76,7 +104,7 @@ end
 
     roots.each { |r|
       thisnode=r
-      tree_node = create_json(thisnode,root_url,true,nil)
+      tree_node = create_json(thisnode,root_url,true)
       treedata[:issues] << tree_node
     }
     return treedata
