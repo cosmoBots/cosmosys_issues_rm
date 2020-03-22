@@ -16,7 +16,7 @@ def tree_to_dict_list(tree,parentNode):
     #print("\n\n\n******ARBOL******* len= ",len(tree))
     for node in tree:
         node['chapters'] = []
-        node['Issues'] = []
+        node['issues'] = []
         #print("\n\n\n******NODO*******",node['id'])
         if (node['id']) == (node['doc_id']):
             result3.append(node)
@@ -26,7 +26,7 @@ def tree_to_dict_list(tree,parentNode):
             # partir de los documentos en forma de árbol
             data['Issuedocs'][str(node['doc_id'])]['children'] = node['children']
             data['Issuedocs'][str(node['doc_id'])]['chapters'] = []
-            data['Issuedocs'][str(node['doc_id'])]['Issues'] = []
+            data['Issuedocs'][str(node['doc_id'])]['issues'] = []
 
         if 'type' in node.keys():
             if (node['type'] == "Info"):
@@ -42,16 +42,16 @@ def tree_to_dict_list(tree,parentNode):
             else:
                 node['infoType'] = 0
                 if (parentNode != None):
-                    parentNode['Issues'].append(node)
+                    parentNode['issues'].append(node)
                     if (parentNode['id'] == parentNode['doc_id']):
-                        data['Issuedocs'][str(node['doc_id'])]['Issues'].append(node)
+                        data['Issuedocs'][str(node['doc_id'])]['issues'].append(node)
 
         else:
             node['infoType'] = 0
             if (parentNode != None):
-                parentNode['Issues'].append(node)
+                parentNode['issues'].append(node)
                 if (parentNode['id'] == parentNode['doc_id']):
-                    data['Issuedocs'][str(node['doc_id'])]['Issues'].append(node)
+                    data['Issuedocs'][str(node['doc_id'])]['issues'].append(node)
 
 
         #print(node['subject'])
@@ -111,12 +111,12 @@ my_project = data['project']
 #print ("Obtenemos proyecto: ", my_project['id'], " | ", my_project['name'])
 
 Issuedocs = data['Issuedocs']
-Issues = data['Issues']
+issues = data['issues']
 targets = data['targets']
 statuses = data['statuses']
-# Ahora vamos a generar los diagramas de jerarquía y de dependencia para cada una de los Issues, y los guardaremos en la carpeta doc.
-#print("len(Issues)",len(Issues))
-Issuedict,Issuelist,my_doc_issues = tree_to_dict_list(Issues,None)
+# Ahora vamos a generar los diagramas de jerarquía y de dependencia para cada una de los issues, y los guardaremos en la carpeta doc.
+#print("len(issues)",len(issues))
+Issuedict,Issuelist,my_doc_issues = tree_to_dict_list(issues,None)
 
 #print("ACABAMOS!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
@@ -200,7 +200,7 @@ for my_issue in my_doc_issues:
     
     current_version = my_issue['fixed_version_id']
           
-# Ahora crearemos los Issues "hijos" dentro de cada documento
+# Ahora crearemos los issues "hijos" dentro de cada documento
 
 # In[ ]:
 

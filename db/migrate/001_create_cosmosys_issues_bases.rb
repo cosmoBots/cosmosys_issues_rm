@@ -9,9 +9,17 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 			t.text :result
 		end
 
+		tracker_ids = []
+		Tracker.all.each{|tr|
+			tracker_ids << tr.id
+		}
 		rqchapterfield = IssueCustomField.create!(:name => 'IssChapter', 
 			:field_format => 'string', :searchable => false,
-			:is_for_all => true, :tracker_ids => [rqtrck.id, rqdoctrck.id])
+			:is_for_all => true, :tracker_ids => tracker_ids)
+
+		rqtitlefield = IssueCustomField.create!(:name => 'IssTitle', 
+			:field_format => 'string', :searchable => true,
+			:is_for_all => true, :tracker_ids => tracker_ids)
 
 		link_str = "link"
 
@@ -21,13 +29,13 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 			:field_format => 'link', :description => "A link to the Hierarchy Diagram",
 			:url_pattern => "/projects/%project_identifier%/repository/rq/raw/reporting/doc/img/%id%_h.gv.svg",
 			:default_value => link_str,
-			:is_for_all => true, :tracker_ids => [rqtrck.id, rqdoctrck.id])
+			:is_for_all => true, :tracker_ids => tracker_ids)
 
 		rqdepdiaglink = IssueCustomField.create!(:name => 'IssDependenceDiagram',
 			:field_format => 'link', :description => "A link to the Dependence Diagram",
 			:url_pattern => "/projects/%project_identifier%/repository/rq/raw/reporting/doc/img/%id%_d.gv.svg",
 			:default_value => link_str,
-			:is_for_all => true, :tracker_ids => [rqtrck.id, rqdoctrck.id])
+			:is_for_all => true, :tracker_ids => tracker_ids)
 
 		# Project part
 		# Create diagrams custom fields
@@ -41,6 +49,9 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 			:url_pattern => "/projects/%project_identifier%/repository/rq/raw/reporting/doc/img/%project_identifier%_d.gv.svg",
 			:default_value => link_str)
 
+		rqprefixfield = ProjectCustomField.create!(:name => 'IssPrefix', 
+			:field_format => 'string', :description => "Prefix for issue IDs",
+			:default_value => "TSK-", :is_for_all => true, :is_required => true)
 
 		link_str = "link"
 
@@ -125,8 +136,16 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 		if (tmp != nil) then
 			tmp.destroy
 		end
+		tmp = ProjectCustomField.find_by_name('IssPrefix')
+		if (tmp != nil) then
+			tmp.destroy
+		end		
 
 		tmp = IssueCustomField.find_by_name('IssChapter')
+		if (tmp != nil) then
+			tmp.destroy
+		end
+		tmp = IssueCustomField.find_by_name('IssTitle')
 		if (tmp != nil) then
 			tmp.destroy
 		end

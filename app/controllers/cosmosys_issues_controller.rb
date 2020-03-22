@@ -3,7 +3,9 @@ class CosmosysIssuesController < ApplicationController
 
   @@chapterdigits = 3
   @@cfchapter = IssueCustomField.find_by_name('IssChapter')
-  
+  @@cfprefix = ProjectCustomField.find_by_name('IssPrefix')
+  @@cftitle = IssueCustomField.find_by_name('IssTitle')
+
   @@tmpdir = './tmp/cosmosys_issue_plugin/'
 
   def index
@@ -29,7 +31,7 @@ class CosmosysIssuesController < ApplicationController
           destdir = "#{Setting.plugin_cosmosys_issues['repo_local_path']}"
           destdir["%project_id%"]= @project.identifier
           origdir = "#{Setting.plugin_cosmosys_issues['repo_local_path']}"
-          origdir["%project_id%"]= Setting.plugin_cosmosys_issues['repo_template_id']
+          origdir["%project_id%"]= Setting.plugin_cosmosys_issues['f']
 
           # Now we have to know if the destination directory already exists
           if (File.directory?(destdir)) then
@@ -76,9 +78,9 @@ class CosmosysIssuesController < ApplicationController
         end 
       end
       if @output.size <= 255 then 
-          flash[:notice] = @output.to_s
+        flash[:notice] = @output.to_s
       else
-          flash[:notice] = "Message too long\n"
+        flash[:notice] = "Message too long\n"
       end
       print(@output)
     end
@@ -145,12 +147,16 @@ class CosmosysIssuesController < ApplicationController
     issue_upload_doc_row = 0
     issue_upload_doc_desc_column = 6
     issue_upload_doc_parent_column = 8
+    issue_upload_doc_title_column = 1
+    issue_upload_doc_prefix_column = 10
+
 
     #This section defines the issues information cell indexes to retrieve information for the issues from the upload file
     issue_upload_first_row = 2
     issue_upload_column_number = issue_upload_end_column + 1
     issue_upload_subject_column = 4
     issue_upload_related_column = 10
+    issue_upload_title_column = 5    
     issue_upload_descr_column = 6
     issue_upload_chapter_column = 0
     issue_upload_target_column = 12
@@ -212,14 +218,14 @@ class CosmosysIssuesController < ApplicationController
                   findVersionSuccess = false
                   thisVersionId = nil
                   my_project_versions.each { |v|  
-                      if not(findVersionSuccess) then
-                          if (v.name == thisversion) then
-                              findVersionSuccess = true
+                    if not(findVersionSuccess) then
+                      if (v.name == thisversion) then
+                        findVersionSuccess = true
                               #print("la version ",thisversion," ya existe")
+                            end
                           end
-                      end
-                  }
-                  if not findVersionSuccess then
+                        }
+                        if not findVersionSuccess then
                       #print("la version " + thisversion + " no existe")
                       nv = @project.versions.new
                       nv.name = thisversion
@@ -229,121 +235,153 @@ class CosmosysIssuesController < ApplicationController
                       nv.save
                       my_project_versions << nv
                       #print("\nhe creado la version " + nv.name + "con id " + nv.id.to_s)
+                    end
                   end
                 end
-              end
 
-              sheetindex = 1
-              thissheet = book.worksheets(sheetindex)
-
-# Ya tenemos los documentos de Issues (pestañas) cargados como Issues padres.  Ahora puedo recorrer los Issues de cada una de las pestañas y crear los Issues que falten.
-
-# In[ ]:
-
-              status_dict = {}
-              IssueStatus.all.each{|st|
-                  status_dict[st.name] = st.id
-              }
-              sheetindex = 1
-              thissheet = book.worksheets(sheetindex)
-              while (thissheet != nil) do
-                docidstr = thissheet.name
-                if ((docidstr[0] != '_') and (thissheet != dictsheet) and (thissheet != introsheet) and (thissheet != templatesheet)) then
-                  # Tratamos la hoja en concreto
-                  current_row = issue_upload_first_row+1
-                  while (current_row <= issue_upload_end_row) do
-                    r = thissheet.row(current_row)
-                    #print("\nTrato la fila "+ current_row.to_s)
-                    #print("title: ",title_str)
-                    # Estamos procesando las lineas de Issues
-                    issuesubjstr = r[issue_upload_subject_column+1]
-                    #print("rqid: "+issuesubjstr)
-                    descr = r[issue_upload_descr_column+1]
-                    rqchapterstr = r[issue_upload_chapter_column+1].to_s
-                    rqchapterarray = rqchapterstr.split('.')
-                    #print(rqchapterarray)
-                    rqchapterstring = ""
-                    rqchapterarray.each { |e|
-                      rqchapterstring += e.to_i.to_s.rjust(@@chapterdigits, "0")+"."
-                    }
-                    rqchapter = IssueDocPrefix + rqchapterstring
-                    #print(rqchapter)
-                    rqstatus = status_dict[r[issue_upload_status_column+1]]
-                    rqtarget = r[issue_upload_target_column+1]
-
-                    # Usando el identificador del documento, determinamos si este ya existe o hay que crearlo
-                    thisIssue = @project.issues.find_by_subject(issuesubjstr)
-                    if (thisIssue == nil) then
-                      # no existe el Issue asociado a la fila, lo creo
-                      print ("Creando Isssue " + issuesubjstr)
-                      thisIssue = @project.issues.new
-                      thisIssue.author = User.current
-                      thisIssue.tracker = "Req"
-                      thisIssue.subject = issuesubjstr
-                      if (descr != nil) then
-                        #print("description: ",descr)
-                        thisIssue.description = descr
-                      end
-                      thisIssue.save
-                    else                      
-                      #print("si existe el Isssue")
-                      thisIssue.tracker = "Req"
-                      if (descr != nil) then
-                        #print("description: ",descr)
-                        thisIssue.description = descr
-                      end
-                    end
-                    if (rqstatus != nil) then
-                      #print("rqstatus: ",rqstatus)
-                      thisIssue.status = IssueStatus.find(rqstatus)
-                    end
-                    if (rqtarget != nil) then
-                      #print("rqtarget: ",rqtarget)
-                      findVersionSuccess = false
-                      thisVersion = nil
-                      #print("num versiones: ",@project.versions.size)
-                      @project.versions.each { |v|  
-                        if not(findVersionSuccess) then
-                          if (v.name == rqtarget) then
-                            #print("LO ENCONTRE!!")
-                            findVersionSuccess = true
-                            thisVersion = v
-                          else
-                            #print("NO.....")
-                          end                                
-                        end
-                      }
-                      if (findVersionSuccess) then
-                        #print("this version succes????:",findVersionSuccess)
-                        #print("thisVersionId: ",thisVersion.id)
-                        thisIssue.fixed_version = thisVersion
-                      end
-                    end                        
-                    if (rqchapter != nil) then
-                      #print("rqchapter: ",rqchapter)
-                      cfc = thisIssue.custom_values.find_by_custom_field_id(@@cfchapter.id)
-                      cfc.value = rqchapter
-                      cfc.save
-                    end
-                    thisIssue.save
-                    #print("He actualizado o creado el Isssue con id "+thisIssue.id.to_s)
-
-                    current_row += 1
-                  end        
-                end
-                sheetindex += 1
+                sheetindex = 1
                 thissheet = book.worksheets(sheetindex)
-              end
 
+                status_dict = {}
+                IssueStatus.all.each{|st|
+                  status_dict[st.name] = st.id
+                }
 
+                sheetindex = 1
+                thissheet = book.worksheets(sheetindex)
+                while (thissheet != nil) do
+                  docidstr = thissheet.name
+                  if ((docidstr[0] != '_') and (thissheet != dictsheet) and (thissheet != introsheet) and (thissheet != templatesheet)) then
+                    # Tratamos la hoja en concreto
+                    #print("DocID: "+docidstr)
+                    # Obtenemos la informacion de la fila donde estan los datos adicionales del documento de requisito
+                    d = thissheet.row(issue_upload_doc_row+1)
+                    # Como título del documento tomamos la columna de doctitle
+                    doctitle = d[issue_upload_doc_title_column+1]
+                    #print("DocTitle: ",doctitle)
+                    docdesc = d[issue_upload_doc_desc_column+1]
+                    #print("DocDesc: ",docdesc)
+                    # Como prefijo de los codigos generados por el documento, tomamos la columna de prefijo
+                    prefixstr = d[issue_upload_doc_prefix_column+1]
+                    prjprefix = @project.custom_values.find_by_custom_field_id(@@cfprefix.id)
+                    prjprefix.value = prefixstr
+                    prjprefix.save  
+                    # Tratamos la hoja en concreto
+                    current_row = issue_upload_first_row+1
+                    while (current_row <= issue_upload_end_row) do
+                      r = thissheet.row(current_row)
+                      #print("\nTrato la fila "+ current_row.to_s)
+                      #print("title: ",title_str)
+                      # Estamos procesando las lineas de issues
+                      issuesubjstr = r[issue_upload_subject_column+1]
+                      if (issuesubjstr != nil) then
+                        #print("rqid: "+issuesubjstr)
+                        title_str = r[issue_upload_title_column+1]
+                        if (title_str != nil) then
+                          print("****** TITLE *******")
+                          print(title_str)
+                          descr = r[issue_upload_descr_column+1]
+                          rqchapterstr = r[issue_upload_chapter_column+1].to_s
+                          if (rqchapterstr == "") then
+                            rqchapter = issuesubjstr
+                          else
+                            rqchapterstrarray = rqchapterstr.split('-')
+                            if (rqchapterstrarray.size > 1) then
+                              rqchapterstr = rqchapterstrarray[1]
+                            else
+                              rqchapterstr = rqchapterstrarray[0]
+                            end
+                            if (rqchapterstr == "") then
+                              rqchapter = issuesubjstr
+                            else
+                              rqchapterarray = rqchapterstr.split('.')
+                              #print(rqchapterarray)
+                              rqchapterstring = ""
+                              rqchapterarray.each { |e|
+                                rqchapterstring += e.to_i.to_s.rjust(@@chapterdigits, "0")+"."
+                              }
+                              rqchapter = prefixstr+"-"+rqchapterstring
+                            end                            
+                          end
+                          #print(rqchapter)
+                          rqstatus = status_dict[r[issue_upload_status_column+1]]
+                          rqtarget = r[issue_upload_target_column+1]
 
-
-# Ahora buscamos las relaciones entre Issues padres e hijos, y de dependencia.
-              sheetindex = 1
-              thissheet = book.worksheets(sheetindex)
-              while (thissheet != nil) do
-                docidstr = thissheet.name
-                if ((docidstr[0] != '_') and (thissheet != dictsheet) and (thissheet != introsheet) and (thissheet != templatesheet)) then
+                          # Usando el identificador del documento, determinamos si este ya existe o hay que crearlo
+                          thisIssue = @project.issues.find_by_subject(issuesubjstr)
+                          if (thisIssue == nil) then
+                            # no existe el Issue asociado a la fila, lo creo
+                            print ("Creando Issue " + issuesubjstr)
+                            thisIssue = @project.issues.new
+                            thisIssue.author = User.current
+                            thisIssue.tracker = Tracker.find_by_name("Feature")
+                            thisIssue.subject = issuesubjstr
+                            if (descr != nil) then
+                              #print("description: ",descr)
+                              thisIssue.description = descr
+                            end
+                            thisIssue.save
+                          else                      
+                            #print("si existe el Isssue")
+                            thisIssue.tracker = Tracker.find_by_name("Feature")
+                            if (descr != nil) then
+                              #print("description: ",descr)
+                              thisIssue.description = descr
+                            end
+                          end
+                          if (rqstatus != nil) then
+                            #print("rqstatus: ",rqstatus)
+                            thisIssue.status = IssueStatus.find(rqstatus)
+                          end
+                          if (rqtarget != nil) then
+                            #print("rqtarget: ",rqtarget)
+                            findVersionSuccess = false
+                            thisVersion = nil
+                            #print("num versiones: ",@project.versions.size)
+                            @project.versions.each { |v|  
+                              if not(findVersionSuccess) then
+                                if (v.name == rqtarget) then
+                                  #print("LO ENCONTRE!!")
+                                  findVersionSuccess = true
+                                  thisVersion = v
+                                else
+                                  #print("NO.....")
+                                end                                
+                              end
+                            }
+                            if (findVersionSuccess) then
+                              #print("this version succes????:",findVersionSuccess)
+                              #print("thisVersionId: ",thisVersion.id)
+                              thisIssue.fixed_version = thisVersion
+                            end
+                          end
+                          if (title_str != nil) then
+                            cft = thisIssue.custom_values.find_by_custom_field_id(@@cftitle.id)
+                            cft.value = title_str
+                            cft.save
+                          end                                            
+                          if (rqchapter != nil) then
+                            #print("rqchapter: ",rqchapter)
+                            cfc = thisIssue.custom_values.find_by_custom_field_id(@@cfchapter.id)
+                            cfc.value = rqchapter
+                            cfc.save
+                          end
+                          thisIssue.save
+                          #print("He actualizado o creado el Isssue con id "+thisIssue.id.to_s)
+                        end
+                      end
+                      current_row += 1
+                    end        
+                  end
+                  sheetindex += 1
+                  thissheet = book.worksheets(sheetindex)
+                end
+                # Ahora buscamos las relaciones entre issues padres e hijos, y de dependencia.
+                sheetindex = 1
+                thissheet = book.worksheets(sheetindex)
+                while (thissheet != nil) do
+                  docidstr = thissheet.name
+                  if ((docidstr[0] != '_') and (thissheet != dictsheet) and (thissheet != introsheet) and (thissheet != templatesheet)) then
                   # Tratamos la hoja en concreto
                   #print("DocID: "+docidstr)
                   # Usando el identificador del documento, determinamos si este ya existe o hay que crearlo
@@ -351,16 +389,13 @@ class CosmosysIssuesController < ApplicationController
                   while (current_row <= issue_upload_end_row) do
                     r = thissheet.row(current_row)
                     #print("\nTrato la fila "+ current_row.to_s)
-                    # Estamos procesando las lineas de Issues
+                    # Estamos procesando las lineas de issues
                     issuesubjstr = r[issue_upload_subject_column+1]
                     #print("rqid: "+issuesubjstr)
                     thisIssue = @project.issues.find_by_subject(issuesubjstr)
                     if (thisIssue != nil) then
-
                       parent_str = r[issue_upload_parent_column+1]
                       related_str = r[issue_upload_related_column+1]
-
-
                       if (parent_str != nil) then
                         #print("parent_str: ",parent_str)
                         parentissue = @project.issues.find_by_subject(parent_str)
@@ -372,15 +407,13 @@ class CosmosysIssuesController < ApplicationController
                           print("ERROR: No encontramos el Isssue padre!!!")
                         end
                       else
-                        # El Isssue no tiene padre, asi que su padre sera el documento
-                        thisIssue.parent = thisdoc
                       end
 
                       # Exploramos ahora las relaciones de dependencia
                       # Busco las relaciones existences con este Isssue
                       # Como voy a tratar las que tienen el Isssue como destino, las filtro
                       my_filtered_issue_relations = thisIssue.relations_to
-                      # Al cargar Issues puede ser que haya antiguas relaciones que ya no existan.  Al finalizar la carga
+                      # Al cargar issues puede ser que haya antiguas relaciones que ya no existan.  Al finalizar la carga
                       # deberemos eliminar los remanentes, asi que meteremos la lista de relaciones en una lista de remanentes
                       residual_relations = [] 
                       my_filtered_issue_relations.each { |e|
@@ -393,17 +426,17 @@ class CosmosysIssuesController < ApplicationController
                       if (related_str != nil) then
                         #print("\nrelated: '"+related_str+"'")
                         if (related_str[0]!='-') then
-                          # Ahora saco todos los ID de los Issues del otro lado (en el lado origen de la relacion)
+                          # Ahora saco todos los ID de los issues del otro lado (en el lado origen de la relacion)
                           related_issue = related_str.split()
-                          related_iss.each { |rIssue|
+                          related_issue.each { |rIssue|
                             rIssue = rIssue.strip()
                             #print("\n  related to: '"+rIssue+"'")
                             # Busco ese Isssue
                             blocking_issue = @project.issues.find_by_subject(rIssue)
                             if (blocking_issue != nil) then
-                              #print(" encontrado ",blocking_iss.id)
+                              #print(" encontrado ",blocking_issue.id)
                               # Veo si ya existe algun tipo de relacion con el
-                              preexistent_relations = thisIssue.relations_to.where(issue_from: blocking_iss)
+                              preexistent_relations = thisIssue.relations_to.where(issue_from: blocking_issue)
                               #print(preexistent_relations)
                               already_exists = false
                               if (preexistent_relations.size>0) then
@@ -417,7 +450,7 @@ class CosmosysIssuesController < ApplicationController
                               end
                               if not(already_exists) then
                                 #print("Creo una nueva relacion")
-                                relation = blocking_iss.relations_from.new
+                                relation = blocking_issue.relations_from.new
                                 relation.issue_to=thisIssue
                                 relation.relation_type='blocks'
                                 relation.save
@@ -436,12 +469,12 @@ class CosmosysIssuesController < ApplicationController
                           #print("Destruyo la relacion", r)
                           r.issue_from.relations_from.delete(r)
                           r.destroy
-                      }
-                      thisIssue.save
+                        }
+                        thisIssue.save
                       #print("He actualizado o creado el Isssue con id "+thisIssue.id.to_s)
-                      else
-                        print("Error, el Isssue no pudo ser encontrado")
-                      end
+                    else
+                      print("Error, el Issue no pudo ser encontrado")
+                    end
                     current_row += 1
                   end        
                 end
@@ -460,10 +493,10 @@ class CosmosysIssuesController < ApplicationController
         end
       end
       if @output.size <= 255 then 
-          @output += "Ok: issues uploaded.\n"
-          flash[:notice] = @output.to_s
+        @output += "Ok: issues uploaded.\n"
+        flash[:notice] = @output.to_s
       else
-          flash[:notice] = "Message too long\n"
+        flash[:notice] = "Message too long\n"
       end
       print(@output)
     end
@@ -517,11 +550,11 @@ class CosmosysIssuesController < ApplicationController
                   print("acabo el comando")
                 ensure
                    #tmpfile.unlink   # deletes the temp file
-                end
-                git_commit_repo(@project,"[Issuebot] reports generated")
-                git_pull_rm_repo(@project)
-                @output += "Ok: reports generated and diagrams updated.\n"
-              else
+                 end
+                 git_commit_repo(@project,"[Issuebot] reports generated")
+                 git_pull_rm_repo(@project)
+                 @output += "Ok: reports generated and diagrams updated.\n"
+               else
                 @output += "Error: the img path is not found\n"
                 print(imgpath)
               end
@@ -591,7 +624,7 @@ class CosmosysIssuesController < ApplicationController
                 print("acabo el comando")
               ensure
                  #tmpfile.unlink   # deletes the temp file
-              end
+               end
 
               #`#{comando}`
               #p output
@@ -608,9 +641,9 @@ class CosmosysIssuesController < ApplicationController
         end
       end
       if @output.size <= 255 then 
-          flash[:notice] = @output.to_s
+        flash[:notice] = @output.to_s
       else
-          flash[:notice] = "Message too long\n"
+        flash[:notice] = "Message too long\n"
       end
       print(@output)
     end
@@ -631,6 +664,7 @@ class CosmosysIssuesController < ApplicationController
   def tree
     require 'json'
 
+    is_project = false
     if request.get? then
       print("GET!!!!!")
       if (params[:node_id]) then
@@ -640,6 +674,7 @@ class CosmosysIssuesController < ApplicationController
         print("PROYECTO!!!\n")     
         res = @project.issues.where(:parent => nil).limit(1)
         thisnodeid = res.first.id
+        is_project = true
       end
       thisnode=Issue.find(thisnodeid)
 
@@ -665,7 +700,7 @@ class CosmosysIssuesController < ApplicationController
 
       treedata = []
 
-      tree_node = create_tree(thisnode,root_url)
+      tree_node = create_tree(thisnode,root_url,is_project)
 
       treedata << tree_node
 
@@ -695,12 +730,18 @@ class CosmosysIssuesController < ApplicationController
       structure = params[:structure]
       json_params_wrapper = JSON.parse(request.body.read())
       structure = json_params_wrapper['structure']
-      #print ("structure: \n\n")
-      #print structure
+      print ("structure: \n\n")
+      print structure
       rootnode = structure[0]
-      structure.each { |n|
-        CosmosysIssuesBase.update_node(n,nil,"",1)
-      }
+      prjprefix = @project.custom_values.find_by_custom_field_id(@@cfprefix.id).value+"-"
+      ch = rootnode['children']
+      chord = 1
+      if (ch != nil) then
+         ch.each { |c| 
+          CosmosysIssuesBase.update_node(c,nil,prjprefix,chord)
+          chord += 1
+        }
+      end      
       redirect_to :action => 'tree', :method => :get, :id => @project.id 
     end
 
@@ -803,47 +844,68 @@ class CosmosysIssuesController < ApplicationController
   end
 
 
-  def create_tree(current_issue, root_url)
+  def create_tree(current_issue, root_url, is_project)
+
+    if (is_project) then
+      output = ""
+      output += ("\project: " + current_issue.project.name)
+      issue_url = root_url + '/projects/' + current_issue.project.identifier
+      output += ("\nissue_url: " + issue_url.to_s)
+      issue_new_url = root_url + '/projects/' + current_issue.project.identifier + '/issues/new'
+      output += ("\nissue_new_url: " + issue_new_url.to_s)
+      cfprefixvalue = current_issue.project.custom_values.find_by_custom_field_id(@@cfprefix.id).value
+
+      tree_node = {'title':  cfprefixvalue + ". " + current_issue.project.identifier  + ": " + current_issue.project.name,
+       'subtitle': current_issue.project.description,
+       'expanded': true,
+       'id': current_issue.project.id.to_s,
+       'return_url': root_url+'/cosmosys_issues/'+current_issue.project.id.to_s+'/tree.json',
+       'issue_show_url': issue_url,
+       'issue_new_url': issue_new_url,
+       'issue_edit_url': issue_url+"/edit",
+       'children': []
+     }
+   else
     output = ""
     output += ("\nissue: " + current_issue.subject)
     issue_url = root_url + '/issues/' + current_issue.id.to_s
     output += ("\nissue_url: " + issue_url.to_s)
-    issue_new_url = root_url + '/projects/' + current_issue.project.identifier + '/issues/new?issue[parent_issue_id]=' + current_issue.id.to_s + '&issue[tracker_id]=' + "Req"
+    issue_new_url = root_url + '/projects/' + current_issue.project.identifier + '/issues/new?issue[parent_issue_id]=' + current_issue.id.to_s + '&issue[tracker_id]=' + "Feature"
     output += ("\nissue_new_url: " + issue_new_url.to_s)
-      issue_new_doc_url = root_url + '/projects/' + current_issue.project.identifier + '/issues/new?issue[parent_issue_id]=' + current_issue.id.to_s + '&issue[tracker_id]=' +  + "Req"
-    output += ("\nissue_new_url: " + issue_new_doc_url.to_s)
-
-    cftitlevalue = current_issue.subject
+    cftitlevalue = current_issue.custom_values.find_by_custom_field_id(@@cftitle.id).value
     cfchaptervalue = current_issue.custom_values.find_by_custom_field_id(@@cfchapter.id).value
     separator_idx = cfchaptervalue.rindex('-')
     cfchapterarraywrapper = [cfchaptervalue.slice(0..separator_idx), cfchaptervalue.slice((separator_idx+1)..-1)]
-    #print(cfchapterarraywrapper)
-    cfchapterstring = cfchapterarraywrapper[0]
-    if (cfchapterarraywrapper[1] != nil) then 
-      cfchapterarray = cfchapterarraywrapper[1].split('.')
-      cfchapterarray.each { |e|
-        cfchapterstring += e.to_i.to_s + "."
-      }
-    end
-    tree_node = {'title':  cfchapterstring + " " + current_issue.subject,
-             'subtitle': current_issue.description,
-             'expanded': true,
-             'id': current_issue.id.to_s,
-             'return_url': root_url+'/cosmosys_issues/'+current_issue.project.id.to_s+'/tree.json',
-             'issue_show_url': issue_url,
-             'issue_new_url': issue_new_url,
-             'issue_new_doc_url': issue_new_doc_url,
-             'issue_edit_url': issue_url+"/edit",
-             'children': []
-            }
+      #print(cfchapterarraywrapper)
+      cfchapterstring = cfchapterarraywrapper[0]
+      if (cfchapterarraywrapper[1] != nil) then 
+        cfchapterarray = cfchapterarraywrapper[1].split('.')
+        cfchapterarray.each { |e|
+          cfchapterstring += e.to_i.to_s + "."
+        }
+      end
+      tree_node = {'title':  cfchapterstring + " " + current_issue.subject  + ": " + cftitlevalue,
+       'subtitle': current_issue.description,
+       'expanded': true,
+       'id': current_issue.id.to_s,
+       'return_url': root_url+'/cosmosys_issues/'+current_issue.project.id.to_s+'/tree.json',
+       'issue_show_url': issue_url,
+       'issue_new_url': issue_new_url,
+       'issue_edit_url': issue_url+"/edit",
+       'children': []
+     }
+   end
 
     #print tree_node
     #print "children: " + tree_node[:children].to_s + "++++\n"
-
-    childrenitems = current_issue.children.sort_by {|obj| obj.custom_values.find_by_custom_field_id(@@cfchapter.id).value}
+    if (is_project) then
+      childrenitems = current_issue.project.issues.where(:parent => nil).sort_by {|obj| obj.custom_values.find_by_custom_field_id(@@cfchapter.id).value}
+    else
+      childrenitems = current_issue.children.sort_by {|obj| obj.custom_values.find_by_custom_field_id(@@cfchapter.id).value}
+    end
     childrenitems.each{|c|
-        child_node = create_tree(c,root_url)
-        tree_node[:children] << child_node
+      child_node = create_tree(c,root_url,false)
+      tree_node[:children] << child_node
     }
 
     return tree_node

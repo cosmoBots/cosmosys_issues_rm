@@ -2,21 +2,25 @@ class CosmosysIssuesBase < ActiveRecord::Base
 
   @@chapterdigits = 3
   @@cfchapter = IssueCustomField.find_by_name('IssChapter')
+  @@cftitle = IssueCustomField.find_by_name('IssTitle')
 
-def self.cfchapter
-  @@cfchapter
-end
+  def self.cfchapter
+    @@cfchapter
+  end
+  def self.cftitle
+    @@cftitle
+  end
 
-def self.get_descendents(n)
-  result = []
-  n.children.each{|c|
-    result.append(c)
-    result += self.get_descendents(c)
-  }
-  return result
-end
+  def self.get_descendents(n)
+    result = []
+    n.children.each{|c|
+      result.append(c)
+      result += self.get_descendents(c)
+    }
+    return result
+  end
 
-def self.create_json(current_issue, root_url, include_doc_children,currentdoc)
+  def self.create_json(current_issue, root_url, include_doc_children,currentdoc)
     tree_node = current_issue.attributes.slice("id","tracker_id","subject","description","status_id","fixed_version_id","parent_id","root_id")
     tree_node[:chapter] = current_issue.custom_values.find_by_custom_field_id(@@cfchapter.id).value
     tree_node[:children] = []
@@ -56,7 +60,7 @@ end
     treedata[:targets] = {}
     treedata[:statuses] = {}
     treedata[:trackers] = {}
-    treedata[:Issues] = []
+    treedata[:issues] = []
 
     IssueStatus.all.each { |st| 
       treedata[:statuses][st.id.to_s] = st.name
@@ -73,7 +77,7 @@ end
     roots.each { |r|
       thisnode=r
       tree_node = create_json(thisnode,root_url,true,nil)
-      treedata[:Issues] << tree_node
+      treedata[:issues] << tree_node
     }
     return treedata
   end
@@ -82,7 +86,7 @@ end
     # n is node, p is parent
     node = Issue.find(n['id'])
     if (node != nil) then
-        nodechapter = prefix+ord.to_s.rjust(@@chapterdigits, "0")+"."
+      nodechapter = prefix+ord.to_s.rjust(@@chapterdigits, "0")+"."
       cfc = node.custom_values.find_by_custom_field_id(@@cfchapter.id)
       cfc.value = nodechapter
       cfc.save      

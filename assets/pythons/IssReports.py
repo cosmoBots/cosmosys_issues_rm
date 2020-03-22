@@ -11,7 +11,7 @@ def tree_to_list(tree,parentNode):
     #print("\n\n\n******ARBOL******* len= ",len(tree))
     for node in tree:
         node['chapters'] = []
-        node['Issues'] = []
+        node['issues'] = []
         #print("\n\n\n******NODO*******",node['id'])
 
         if 'type' in node.keys():
@@ -26,12 +26,12 @@ def tree_to_list(tree,parentNode):
             else:
                 node['infoType'] = 0
                 if (parentNode != None):
-                    parentNode['Issues'].append(node)
+                    parentNode['issues'].append(node)
 
         else:
             node['infoType'] = 0
             if (parentNode != None):
-                parentNode['Issues'].append(node)
+                parentNode['issues'].append(node)
 
 
         #print(node['subject'])
@@ -244,15 +244,15 @@ my_project = data['project']
 
 #print ("Obtenemos proyecto: ", my_project['id'], " | ", my_project['name'])
 
-Issues = data['Issues']
+issues = data['issues']
 targets = data['targets']
 statuses = data['statuses']
-# Ahora vamos a generar los diagramas de jerarquía y de dependencia para cada una de los Issues, y los guardaremos en la carpeta doc.
-#print("len(Issues)",len(Issues))
+# Ahora vamos a generar los diagramas de jerarquía y de dependencia para cada una de los issues, y los guardaremos en la carpeta doc.
+#print("len(issues)",len(issues))
 # Debemos preparar un diagrama para cada nodo
 #print("#####Vamos con los documentos!!!!")
 data['dependents'] = {}
-Issuelist = tree_to_list(Issues,None)
+Issuelist = tree_to_list(issues,None)
 data['Issuelist'] = Issuelist
 
 data['Issueclean'] = []
@@ -298,7 +298,7 @@ diagrams['project'] = {'url_h':url_h, 'url_d':url_d, 'parent_h': parent_g_h, 'se
 import os
 
 #print(Issuelist)
-# Generamos los diagramas correspondientes a los Issues del proyecto
+# Generamos los diagramas correspondientes a los issues del proyecto
 for my_issue in Issuelist:
     #print("\n\n---------- Diagrama ----------", my_issue['subject'])
     path_root = img_path + "/" + str(my_issue['id']) + "_"
@@ -345,7 +345,7 @@ for my_issue in Issuelist:
 
 #print(diagrams)
 
-for rq in Issues:
+for rq in issues:
     generate_diagrams(rq,diagrams,[],my_project['url'],data['dependents'])
 
 
@@ -400,7 +400,7 @@ import json
 
 # Preparamos el fichero JSON que usaremos de puente para generar la documentación
 
-with open(reporting_path + '/doc/Issues.json', 'w') as outfile:
+with open(reporting_path + '/doc/issues.json', 'w') as outfile:
     json.dump(datadoc, outfile)
 
 #print("Acabamos")

@@ -16,7 +16,7 @@ var docName = myArgs[2]
 const fs = require('fs');
 const carbone = require('carbone');
 
-let rawdata = fs.readFileSync(pathRoot+'/doc/Issues.json');  
+let rawdata = fs.readFileSync(pathRoot+'/doc/issues.json');  
 let data = JSON.parse(rawdata);
 
 var options = {

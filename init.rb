@@ -21,12 +21,12 @@ Redmine::Plugin.register :cosmosys_issues do
 
   menu :project_menu, :cosmosys_issues, {:controller => 'cosmosys_issues', :action => 'project_menu' }, :caption => 'cosmoSys-Issue', :after => :activity, :param => :id
   menu :project_menu, :cosmosys_issues_tree, {:controller => 'cosmosys_issues', :action => 'tree' }, :caption => 'IssueTree', :after => :issues, :param => :id
-  menu :project_menu, :cosmosys_show, {:controller => 'cosmosys_issues', :action => 'show' }, :caption => 'IssueShow', :after => :issues, :param => :id
+  menu :project_menu, :cosmosys_show, {:controller => 'cosmosys_issues', :action => 'show' }, :caption => 'issueshow', :after => :issues, :param => :id
 
   settings :default => {
     'repo_local_path' => "/home/redmine/repos/issue_%project_id%",
     'repo_server_sync' => :false,
-    'repo_server_path'  => 'http://gitlab/Issues/issue_%project_id%.git',
+    'repo_server_path'  => 'http://gitlab/issues/issue_%project_id%.git',
     'repo_template_id'  => 'template',
     'repo_redmine_path' => "/home/redmine/repos_redmine/issue_%project_id%.git",
     'repo_redmine_sync' => :true,
