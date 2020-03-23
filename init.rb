@@ -21,7 +21,7 @@ Redmine::Plugin.register :cosmosys_issues do
 
   menu :project_menu, :cosmosys_issues, {:controller => 'cosmosys_issues', :action => 'project_menu' }, :caption => 'cosmoSys-Issue', :after => :activity, :param => :id
   menu :project_menu, :cosmosys_issues_tree, {:controller => 'cosmosys_issues', :action => 'tree' }, :caption => 'IssueTree', :after => :issues, :param => :id
-  menu :project_menu, :cosmosys_show, {:controller => 'cosmosys_issues', :action => 'show' }, :caption => 'issueshow', :after => :issues, :param => :id
+  menu :project_menu, :cosmosys_issues_show, {:controller => 'cosmosys_issues', :action => 'show' }, :caption => 'issueshow', :after => :issues, :param => :id
 
   settings :default => {
     'repo_local_path' => "/home/redmine/repos/issue_%project_id%",
