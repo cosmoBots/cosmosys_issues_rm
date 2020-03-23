@@ -23,6 +23,7 @@ def tree_to_list(tree,parentNode):
                 node['infoType'] = 1
                 if (parentNode != None):
                     parentNode['chapters'].append(node)
+
             else:
                 node['infoType'] = 0
                 if (parentNode != None):
@@ -287,6 +288,8 @@ else:
 
 
 my_project = data['project']
+my_project['chapters'] = []
+my_project['issues'] = []
 
 #print ("Obtenemos proyecto: ", my_project['id'], " | ", my_project['name'])
 
@@ -298,16 +301,38 @@ statuses = data['statuses']
 # Debemos preparar un diagrama para cada nodo
 #print("#####Vamos con los documentos!!!!")
 data['dependents'] = {}
-issueslist = tree_to_list(issues,None)
+issueslist = tree_to_list(issues,my_project)
 data['issueslist'] = issueslist
 
 data['issuesclean'] = []
+data['byperson'] = {}
 
 for r in issueslist:
     if 'type' in r.keys():
         if r['type'] != 'Info':
             data['issuesclean'].append(r)
 
+    if 'assigned_to' in r.keys():
+        personkey=r['assigned_to']
+        if (personkey == ""):
+            personkey = "nobody"
+        if personkey not in data['byperson'].keys():
+            data['byperson'][personkey] = {}
+            data['byperson'][personkey]['assigned'] = []
+            data['byperson'][personkey]['supervised'] = []
+
+        data['byperson'][personkey]['assigned'] .append(r)
+
+    if 'supervisor' in r.keys():
+        personkey=r['supervisor']
+        if (personkey == ""):
+            personkey = "nobody"
+        if personkey not in data['byperson'].keys():
+            data['byperson'][personkey] = {}
+            data['byperson'][personkey]['assigned'] = []
+            data['byperson'][personkey]['supervised'] = []
+
+        data['byperson'][personkey]['supervised'].append(r)
 
 #print("len(issueslist)",len(issueslist))
 
@@ -466,11 +491,7 @@ with open(reporting_path + '/doc/issues.json', 'w') as outfile:
 
 from Naked.toolshed.shell import execute_js
 
-# js_command = 'node ' + file_path + " " + arguments
-#print(reqdocs.keys())
-#for doc in reqdocs.keys():
-#print(reqdocs[doc])
-success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path+" PRJ PROJECT")
+success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path+" "+data['project']['identifier']+" "+data['project']['name']+" 0")
 #print(success)
 
 if success:
@@ -480,6 +501,20 @@ if success:
 else:
     # handle failure of the JavaScript
     print("todo fue mal")
+
+# js_command = 'node ' + file_path + " " + arguments
+#print(reqdocs.keys())
+for person in data['byperson'].keys():
+    success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path+" "+person+" "+person+" 1")
+    #print(success)
+
+    if success:
+        # handle success of the JavaScript
+        print("Todo fue bien")
+
+    else:
+        # handle failure of the JavaScript
+        print("todo fue mal")
 
 # Vamos a generar el archivo JSON para crear el árbol
 
