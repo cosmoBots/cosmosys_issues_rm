@@ -31,7 +31,7 @@ class CosmosysIssuesController < ApplicationController
           destdir = "#{Setting.plugin_cosmosys_issues['repo_local_path']}"
           destdir["%project_id%"]= @project.identifier
           origdir = "#{Setting.plugin_cosmosys_issues['repo_local_path']}"
-          origdir["%project_id%"]= Setting.plugin_cosmosys_issues['f']
+          origdir["%project_id%"]= Setting.plugin_cosmosys_issues['repo_template_id']
 
           # Now we have to know if the destination directory already exists
           if (File.directory?(destdir)) then
