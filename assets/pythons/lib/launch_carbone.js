@@ -13,6 +13,7 @@ var docId = myArgs[1]
 var docName = myArgs[2]
 //console.log('docName: ', docName);
 var useDocId = myArgs[3]
+//console.log('useDocId: ', useDocId);
 
 const fs = require('fs');
 const carbone = require('carbone');
@@ -39,9 +40,9 @@ if (useDocId == "0") {
 	if (err) return console.log(err);
 	fs.writeFileSync(pathRoot+'/doc/'+docName+'.odt', result);
 	});
-
 	carbone.render(pathRoot+'/templates/issues_byperson_template.ods', data, options, function(err, result){
 	if (err) return console.log(err);
 	fs.writeFileSync(pathRoot+'/doc/'+docName+'.ods', result);
 	});
+
 }

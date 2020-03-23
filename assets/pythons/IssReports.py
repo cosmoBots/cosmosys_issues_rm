@@ -491,7 +491,7 @@ with open(reporting_path + '/doc/issues.json', 'w') as outfile:
 
 from Naked.toolshed.shell import execute_js
 
-success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path+" "+data['project']['identifier']+" "+data['project']['name']+" 0")
+success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path+" "+data['project']['identifier']+" \""+data['project']['name']+"\" 0")
 #print(success)
 
 if success:
@@ -504,7 +504,9 @@ else:
 
 # js_command = 'node ' + file_path + " " + arguments
 #print(reqdocs.keys())
+
 for person in data['byperson'].keys():
+    print(person)
     success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path+" "+person+" "+person+" 1")
     #print(success)
 

@@ -11,7 +11,13 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 
 		tracker_ids = []
 		Tracker.all.each{|tr|
-			tracker_ids << tr.id
+			if tr.name = "Req" then
+			else
+				if tr.name = "ReqDoc" then
+				else
+					tracker_ids << tr.id
+				end
+			end
 		}
 		rqchapterfield = IssueCustomField.create!(:name => 'IssChapter', 
 			:field_format => 'string', :searchable => false,
@@ -20,6 +26,11 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 		rqtitlefield = IssueCustomField.create!(:name => 'IssTitle', 
 			:field_format => 'string', :searchable => true,
 			:is_for_all => true, :tracker_ids => tracker_ids)
+
+		rqestwod = IssueCustomField.create!(:name => 'IssEstWD', 
+			:field_format => 'float', :description => 'Estimated working days',
+			:is_for_all => true, :tracker_ids => tracker_ids)
+
 
 		link_str = "link"
 
@@ -140,7 +151,10 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 		if (tmp != nil) then
 			tmp.destroy
 		end		
-
+		tmp = IssueCustomField.find_by_name('IssEstWD')
+		if (tmp != nil) then
+			tmp.destroy
+		end
 		tmp = IssueCustomField.find_by_name('IssChapter')
 		if (tmp != nil) then
 			tmp.destroy

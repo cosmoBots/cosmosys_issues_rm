@@ -3,6 +3,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
   @@chapterdigits = 3
   @@cfchapter = IssueCustomField.find_by_name('IssChapter')
   @@cftitle = IssueCustomField.find_by_name('IssTitle')
+  @@cfewd = IssueCustomField.find_by_name('IssEstWD')
   @@cfsupervisor = IssueCustomField.find_by_name('Supervisor')
 
   def self.cfchapter
@@ -25,6 +26,13 @@ class CosmosysIssuesBase < ActiveRecord::Base
     tree_node = current_issue.attributes.slice("id","tracker_id","subject","description","status_id","fixed_version_id","parent_id","root_id","assigned_to_id","due_date","start_date","done_ratio")
     tree_node[:chapter] = current_issue.custom_values.find_by_custom_field_id(@@cfchapter.id).value
     tree_node[:title] = current_issue.custom_values.find_by_custom_field_id(@@cftitle.id).value
+    tree_node[:ewd] = nil
+    if @@cfewd != nil then
+      cfewd = current_issue.custom_values.find_by_custom_field_id(@@cfewd.id)
+      if cfewd != nil then
+        tree_node[:ewd] = cfewd.value
+      end
+    end
     tree_node[:supervisor] = ""
     if @@cfsupervisor != nil then
       cvsupervisor = current_issue.custom_values.find_by_custom_field_id(@@cfsupervisor.id)
