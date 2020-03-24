@@ -175,12 +175,13 @@ end
   end
 
   def self.to_graphviz_depcluster(cl,n,isfirst,torecalc,root_url)
+    if ((n.children.size > 0)) then
         shapestr = "record"
         desc = self.get_descendents(n)
         added_nodes = []
         desc.each { |e| 
           if (e.relations.size>0) then
-            labelstr = "{"+e.subject+"|"+e.subject + "}"      
+            labelstr = "{"+e.subject+"|"+e.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
             e_node = cl.add_nodes(e.id.to_s, :label => labelstr,  
               :style => 'filled', :color => 'black', :fillcolor => 'grey', :shape => shapestr,
               :URL => root_url + "/issues/" + e.id.to_s)
@@ -197,28 +198,51 @@ end
           end          
         }
         return cl,torecalc
+    else
+      colorstr = 'black'
+      n_node = cl.add_nodes( n.id.to_s, :label => "{"+n.subject+"|"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",  
+        :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'record',
+        :URL => root_url + "/issues/" + n.id.to_s)
+      n.relations_from.each{|dwn|
+        cl,torecalc=self.to_graphviz_depdwn(cl,n_node,n,dwn.issue_to,isfirst,torecalc,root_url)
+      }
+      n.relations_to.each{|upn|
+        cl,torecalc=self.to_graphviz_depupn(cl,n_node,n,upn.issue_from,isfirst,torecalc,root_url)
+      }
+      return cl,torecalc
+    end    
   end
 
   def self.to_graphviz_depgraph(n,isfirst,torecalc,root_url)
     # Create a new graph
     g = GraphViz.new( :G, :type => :digraph,:margin => 0, :ratio => 'compress', :size => "9.5,30" )
+    if ((n.children.size > 0)) then
+      labelstr = 'Dependences (in subtree)'
+      colorstr = 'orange'
+      fontnamestr = 'times italic'
+    else
       labelstr = 'Dependences'
       colorstr = 'black'
-      fontnamestr = 'times'      
+      fontnamestr = 'times'
+    end    
     cl = g.add_graph(:clusterD, :fontname => fontnamestr, :label => labelstr, :labeljust => 'l', :labelloc=>'t', :margin=> '5', :color => colorstr)
     # Generate output image
-    #g.output( :png => "hello_world.png" )
     cl,torecalc = self.to_graphviz_depcluster(cl,n,isfirst,torecalc,root_url)  
     return g,torecalc
   end
 
 
-
   def self.to_graphviz_hieupn(cl,n_node,n,upn,isfirst,torecalc,root_url)
     colorstr = 'black'
+    if upn.children.size > 0 then
+      shapestr = "note"
+      labelstr = upn.subject+"\n----\n"+upn.custom_values.find_by_custom_field_id(@@cftitle.id).value
+      fontnamestr = 'times italic'            
+    else
       shapestr = "record"
-        labelstr = "{"+upn.subject + "}"
-        fontnamestr = 'times'
+      labelstr = "{"+upn.subject+"|"+upn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+      fontnamestr = 'times'
+    end
     upn_node = cl.add_nodes( upn.id.to_s, :label => labelstr, :fontname => fontnamestr,
       :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => shapestr,
       :URL => root_url + "/issues/" + upn.id.to_s)
@@ -234,9 +258,15 @@ end
 
   def self.to_graphviz_hiedwn(cl,n_node,n,dwn,isfirst,torecalc,root_url)
     colorstr = 'black'
+    if dwn.children.size > 0 then
+      shapestr = "note"
+      labelstr = dwn.subject+"\n----\n"+dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value
+      fontnamestr = 'times italic'            
+    else
       shapestr = "record"
-        labelstr = "{" + dwn.subject + "}"      
-        fontnamestr = 'times'
+      labelstr = "{"+dwn.subject+"|"+dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+      fontnamestr = 'times'
+    end
     dwn_node = cl.add_nodes( dwn.id.to_s, :label => labelstr, :fontname => fontnamestr, 
       :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => shapestr,
       :URL => root_url + "/issues/" + dwn.id.to_s)
@@ -253,9 +283,16 @@ end
 
   def self.to_graphviz_hiecluster(cl,n,isfirst,torecalc,root_url)
     colorstr = 'black'
+    if n.children.size > 0 then
+      shapestr = "note"
+      labelstr = n.subject+"\n----\n"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value
+      fontnamestr = 'times italic'            
+    else
       shapestr = "record"
-        labelstr = "{"+n.subject + "}"      
-        fontnamestr = 'times'
+      labelstr = "{"+n.subject+"|"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+      fontnamestr = 'times'
+    end
+
     n_node = cl.add_nodes( n.id.to_s, :label => labelstr, :fontname => fontnamestr, 
       :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => shapestr,
       :URL => root_url + "/issues/" + n.id.to_s)
@@ -300,9 +337,15 @@ end
 
     p.issues.each{|n|
       colorstr = 'black'
+      if n.children.size > 0 then
+        shapestr = "note"
+        labelstr = n.subject+"\n----\n"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value
+        fontnamestr = 'times italic'            
+      else
         shapestr = "record"
-          labelstr = "{"+n.subject + "}"      
-          fontnamestr = 'times'
+        labelstr = "{"+n.subject+"|"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+        fontnamestr = 'times'
+      end
       hn_node = hcl.add_nodes( n.id.to_s, :label => labelstr, :fontname => fontnamestr, 
         :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => shapestr,
         :URL => root_url + "/issues/" + n.id.to_s)
