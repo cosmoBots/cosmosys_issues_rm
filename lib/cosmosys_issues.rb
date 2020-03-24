@@ -19,7 +19,6 @@
 
 require_dependency 'cosmosys_issues/hooks/model_issue_hook'
 
-
 module CosmosysIssue
-  
+
 end
