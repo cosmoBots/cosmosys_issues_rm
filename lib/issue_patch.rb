@@ -56,7 +56,6 @@ module IssuePatch
           cfisschapter.custom_field = @@cfisschapter
           cfisschapter.customized = self
           cfisschapter.value = nil
-          print(hola0)
         end
         if cfisschapter.value == "" or cfisschapter.value == nil then
           if self.parent != nil then
