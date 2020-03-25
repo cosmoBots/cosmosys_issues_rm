@@ -145,8 +145,8 @@ end
   # -----------------------------------
 
   def self.to_graphviz_depupn(cl,n_node,n,upn,isfirst,torecalc,root_url)
-      colorstr = 'black'
-    upn_node = cl.add_nodes( upn.id.to_s, :label => "{ " + upn.subject + "}",
+    colorstr = 'black'
+    upn_node = cl.add_nodes( upn.id.to_s, :label => "{ "+upn.subject+"|"+upn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",
       :style => 'filled', :color => 'black', :fillcolor => 'grey', :shape => 'record',
       :URL => root_url + "/issues/" + upn.id.to_s)
     cl.add_edges(upn_node, n_node, :color => :blue)
@@ -159,9 +159,11 @@ end
     return cl,torecalc
   end
 
+
+
   def self.to_graphviz_depdwn(cl,n_node,n,dwn,isfirst,torecalc,root_url)
       colorstr = 'black'
-   dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ "+dwn.subject+ "}",  
+    dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ "+dwn.subject+"|"+dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",
       :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => 'record',
       :URL => root_url + "/issues/" + dwn.id.to_s)
     cl.add_edges(n_node, dwn_node, :color => :blue)
