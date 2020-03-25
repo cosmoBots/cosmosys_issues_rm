@@ -161,7 +161,7 @@ end
 
   def self.to_graphviz_depdwn(cl,n_node,n,dwn,isfirst,torecalc,root_url)
       colorstr = 'black'
-   upn_node = cl.add_nodes( upn.id.to_s, :label => "{ "+upn.subject+ "}",  
+   dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ "+dwn.subject+ "}",  
       :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => 'record',
       :URL => root_url + "/issues/" + dwn.id.to_s)
     cl.add_edges(n_node, dwn_node, :color => :blue)
