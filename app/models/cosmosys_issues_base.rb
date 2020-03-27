@@ -46,9 +46,16 @@ class CosmosysIssuesBase < ActiveRecord::Base
         end
       end
     end
-    tree_node[:assigned_to] = ""
+    tree_node[:assigned_to] = []
     if (current_issue.assigned_to != nil) then
-      tree_node[:assigned_to] = current_issue.assigned_to.login
+      if current_issue.assigned_to.class == Group then
+        tree_node[:assigned_to] = [current_issue.assigned_to.lastname]
+        current_issue.assigned_to.users.each{|u|
+          tree_node[:assigned_to].append(u.login)
+        }
+      else
+        tree_node[:assigned_to] = [current_issue.assigned_to.login]
+      end
     end
     if current_issue.children.size == 0 then
       tree_node[:type] = 'Issue'
@@ -75,7 +82,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
     }
 
     return tree_node
-end
+  end
 
 
 
@@ -96,6 +103,7 @@ end
     treedata[:targets] = {}
     treedata[:statuses] = {}
     treedata[:trackers] = {}
+    treedata[:members] = {}
     treedata[:issues] = []
 
     IssueStatus.all.each { |st| 
@@ -104,6 +112,16 @@ end
 
     Tracker.all.each { |tr| 
       treedata[:trackers][tr.id.to_s] = tr.name
+    }
+
+    thisproject.memberships.all.each { |mb| 
+      if mb.principal.class == Group then
+        treedata[:members][mb.principal.lastname.to_s] = mb.principal.attributes.slice("id","lastname") 
+        treedata[:members][mb.principal.lastname.to_s][:class] = mb.principal.class.name
+      else
+        treedata[:members][mb.user.login.to_s] = mb.user.attributes.slice("id","login")
+        treedata[:members][mb.user.login.to_s][:class] = mb.user.class.name
+      end
     }
 
     thisproject.versions.each { |v| 

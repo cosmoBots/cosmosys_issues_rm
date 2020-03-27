@@ -313,15 +313,17 @@ for r in issueslist:
             data['issuesclean'].append(r)
 
             if 'assigned_to' in r.keys():
-                personkey=r['assigned_to']
-                if (personkey == ""):
-                    personkey = "nobody"
-                if personkey not in data['byperson'].keys():
-                    data['byperson'][personkey] = {}
-                    data['byperson'][personkey]['assigned'] = []
-                    data['byperson'][personkey]['supervised'] = []
+                people = r['assigned_to']
+                for personkey in people:
+                    if (personkey == ""):
+                        personkey = "nobody"
+                    if personkey not in data['byperson'].keys():
+                        data['byperson'][personkey] = {}
+                        data['byperson'][personkey]['assigned'] = []
+                        data['byperson'][personkey]['supervised'] = []
 
-                data['byperson'][personkey]['assigned'].append(r)
+                    data['byperson'][personkey]['assigned'].append(r)
+
 
             if 'supervisor' in r.keys():
                 personkey=r['supervisor']
