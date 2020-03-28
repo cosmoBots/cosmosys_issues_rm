@@ -516,6 +516,7 @@ class CosmosysIssuesController < ApplicationController
         # If it is not set, we can not continue
         @output += "Error: the local repos path template is not defined\n"
       else
+        git_pull_repo(@project)      
         # The setting exists, so we can create the origin and destination paths
         repodir = "#{Setting.plugin_cosmosys_issues['repo_local_path']}"
         repodir["%project_id%"] = @project.identifier
