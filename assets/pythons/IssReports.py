@@ -5,6 +5,7 @@
 
 import sys
 import json
+from datetime import datetime
 
 def tree_to_list(tree,parentNode):
     result = []
@@ -307,10 +308,68 @@ data['issueslist'] = issueslist
 data['issuesclean'] = []
 data['byperson'] = {}
 
+for tk in data['targets']:
+    t = data['targets'][tk]
+    t['issues'] = []
+    if 'start_date' in t.keys():
+        t['start_date_int'] = int(datetime.strptime(t['start_date'], '%Y-%m-%d').timestamp())
+    if 'due_date' in t.keys():
+        t['due_date_int'] = int(datetime.strptime(t['due_date'], '%Y-%m-%d').timestamp())
+
+
 for r in issueslist:
+    if 'start_date' in r.keys():
+        r['start_date_int'] = int(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp())
+    if 'due_date' in r.keys():
+        r['due_date_int'] = int(datetime.strptime(r['due_date'], '%Y-%m-%d').timestamp())
+
     if 'type' in r.keys():
         if r['type'] != 'Info':
-            data['issuesclean'].append(r)
+            data['issuesclean'].append(r)            
+            sdt = None
+            ddt = None
+            if 'start_date_int' in r.keys():
+                sdt = r['start_date_int']
+
+            if 'due_date_int' in r.keys():
+                ddt = r['due_date_int']
+
+            periods = []
+
+            include_none = True
+            for tk in data['targets']:
+                t = data['targets'][tk]
+                include_period = True
+                finish_check = True
+                if sdt != None or ddt != None:
+                    finish_check = False
+                    psdt = None
+                    pddt = None
+                    if 'start_date' in t.keys():
+                        psdt = t['start_date_int']
+
+                    if 'due_date' in t.keys():
+                        pddt = t['due_date_int']
+
+                    if sdt != None and pddt != None:
+                        if sdt > pddt:
+                            include_period = False
+                            finish_check = True
+
+                    if not finish_check:
+                        if ddt != None and psdt != None:
+                            if ddt < psdt:
+                                include_period = False
+                                finish_check = True
+
+                if include_period:
+                    include_none = False
+                    periods.append(tk)
+
+            if include_none:
+                periods.append('none')
+
+            r['periods'] = periods
 
             if 'assigned_to' in r.keys():
                 people = r['assigned_to']
@@ -319,11 +378,14 @@ for r in issueslist:
                         personkey = "nobody"
                     if personkey not in data['byperson'].keys():
                         data['byperson'][personkey] = {}
-                        data['byperson'][personkey]['assigned'] = []
-                        data['byperson'][personkey]['supervised'] = []
-
-                    data['byperson'][personkey]['assigned'].append(r)
-
+                        data['byperson'][personkey]['targets'] = {}
+                        for p in periods:
+                            data['byperson'][personkey]['targets'][p] = {}
+                            data['byperson'][personkey]['targets'][p]['assigned'] = []
+                            data['byperson'][personkey]['targets'][p]['supervised'] = []
+                        
+                    for p in periods:                            
+                        data['byperson'][personkey]['targets'][p]['assigned'].append(r)
 
             if 'supervisor' in r.keys():
                 personkey=r['supervisor']
@@ -331,10 +393,16 @@ for r in issueslist:
                     personkey = "nobody"
                 if personkey not in data['byperson'].keys():
                     data['byperson'][personkey] = {}
-                    data['byperson'][personkey]['assigned'] = []
-                    data['byperson'][personkey]['supervised'] = []
+                    data['byperson'][personkey]['targets'] = {}
+                    for p in periods:
+                        data['byperson'][personkey]['targets'][p] = {}
+                        data['byperson'][personkey]['targets'][p]['assigned'] = []
+                        data['byperson'][personkey]['targets'][p]['supervised'] = []
+                        
+                for p in periods:                            
+                    data['byperson'][personkey]['targets'][p]['supervised'].append(r)
 
-                data['byperson'][personkey]['supervised'].append(r)
+
 
 #print("len(issueslist)",len(issueslist))
 
@@ -429,7 +497,6 @@ for my_issue in issueslist:
 for rq in issues:
     generate_diagrams(rq,diagrams,[],my_project['url'],data['dependents'])
 
-
 for my_issue in issueslist:
     prj_graphc_parent = diagrams[str(my_issue['id'])]['parent_h']
     prj_graphc = diagrams[str(my_issue['id'])]['self_h']
@@ -493,7 +560,22 @@ with open(reporting_path + '/doc/issues.json', 'w') as outfile:
 
 from Naked.toolshed.shell import execute_js
 
-success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path+" "+data['project']['identifier']+" \""+data['project']['name']+"\" 0")
+datelim11 = int(datetime.strptime(data['targets']['1']['start_date'], '%Y-%m-%d').timestamp())
+datelim12 = int(datetime.strptime(data['targets']['1']['due_date'], '%Y-%m-%d').timestamp())
+datelim21 = int(datetime.strptime(data['targets']['2']['start_date'], '%Y-%m-%d').timestamp())
+datelim22 = int(datetime.strptime(data['targets']['2']['due_date'], '%Y-%m-%d').timestamp())
+print("Datelim11: ",data['targets']['1']['start_date']," ",datelim11)
+print("Datelim12: ",data['targets']['1']['due_date']," ",datelim12)
+print("Datelim21: ",data['targets']['2']['start_date']," ",datelim21)
+print("Datelim22: ",data['targets']['2']['due_date']," ",datelim22)
+
+
+success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path
+    + " " + data['project']['identifier'] + " \'" + data['project']['name'] + "\' "+"0"
+    + " " + '1' + " " + '2'
+    + " " + str(datelim11) + " " + str(datelim12)
+    + " " + str(datelim21) + " " + str(datelim22)
+    )
 #print(success)
 
 if success:
@@ -509,7 +591,12 @@ else:
 
 for person in data['byperson'].keys():
     print(person)
-    success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path+" "+person+" "+person+" 1")
+    success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path
+        + " " + person + " " + person + " "+"1"
+        + " " + '1' + " " + '2'
+        + " " + str(datelim11) + " " + str(datelim12)
+        + " " + str(datelim21) + " " + str(datelim22)
+        )
     #print(success)
 
     if success:

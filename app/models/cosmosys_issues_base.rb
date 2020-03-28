@@ -5,6 +5,9 @@ class CosmosysIssuesBase < ActiveRecord::Base
   @@cftitle = IssueCustomField.find_by_name('IssTitle')
   @@cfewd = IssueCustomField.find_by_name('IssEstWD')
   @@cfsupervisor = IssueCustomField.find_by_name('Supervisor')
+  @@cfvstartdate = VersionCustomField.find_by_name('Start date')
+  @@cfvwd = VersionCustomField.find_by_name('Working days')
+
 
   def self.cfchapter
     @@cfchapter
@@ -116,16 +119,22 @@ class CosmosysIssuesBase < ActiveRecord::Base
 
     thisproject.memberships.all.each { |mb| 
       if mb.principal.class == Group then
-        treedata[:members][mb.principal.lastname.to_s] = mb.principal.attributes.slice("id","lastname") 
+        treedata[:members][mb.principal.lastname.to_s] = {}
+        treedata[:members][mb.principal.lastname.to_s][:firstname] = mb.principal.lastname
+        treedata[:members][mb.principal.lastname.to_s][:lastname] = "group" 
         treedata[:members][mb.principal.lastname.to_s][:class] = mb.principal.class.name
       else
-        treedata[:members][mb.user.login.to_s] = mb.user.attributes.slice("id","login")
+        treedata[:members][mb.user.login.to_s] = mb.user.attributes.slice("firstname","lastname")
         treedata[:members][mb.user.login.to_s][:class] = mb.user.class.name
       end
     }
 
     thisproject.versions.each { |v| 
-      treedata[:targets][v.id.to_s] = v.name
+      treedata[:targets][v.id.to_s] = {}
+      treedata[:targets][v.id.to_s][:name] = v.name
+      treedata[:targets][v.id.to_s][:due_date] = v.due_date
+      treedata[:targets][v.id.to_s][:start_date] = v.custom_values.find_by_custom_field_id(@@cfvstartdate.id).value
+      treedata[:targets][v.id.to_s][:working_days] = v.custom_values.find_by_custom_field_id(@@cfvwd.id).value
     }
 
     roots.each { |r|
