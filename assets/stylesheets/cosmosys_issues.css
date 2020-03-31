@@ -6,20 +6,39 @@ td.description {
     font-weight: bold;
 }
 
-.IssueDoc .ParentIssue .Issue{
+.IssueDoc {
     border: 1px solid darkgrey;
-    margin-left: 3px;
-    margin-top: 2px;
+    padding-left: 4px;
 }
-.ParentIssue{
-    border: 1px solid darkgrey;
+.ParentIssue {
+    /* border-top: 1px darkgrey; */
+    padding-left: 3px;
     margin-left: 3px;
-    margin-top: 2px;
+    border-style: ridge;
+    border-bottom: hidden;
+    border-left: hidden;
+    border-right: hidden;
+    border: 1px solid darkgrey;
+    margin-bottom: 6px;
+    margin-top: 5px;
 }
-.Issue{
-    border: 1px solid darkgrey;
-    margin-left: 3px;
-    margin-top: 2px;
+
+.ParentIssue h2 h3 h4 h5 h6 h7 h8 h9{
+    padding-left: 4px;
+}
+
+.ParentIssuedescr {
+    padding-left: 3px;
+}
+
+.Issue {
+    border-top: 1px darkgrey;
+    padding-left: 3px;
+    margin-left: 4px;
+    border-style: dotted;
+    border-bottom: hidden;
+    border-left: hidden;
+    border-right: hidden;
 }
 
 .Infodescr{
