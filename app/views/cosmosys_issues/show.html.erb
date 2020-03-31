@@ -6,64 +6,245 @@
 <h1><strong><%= @project.identifier %>: </strong><%= @project.name %></h1>
 <% roots = @project.issues.where(:parent => nil).sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}
 	roots.each { |i| 
-		classdiv = "System"
+          if (i.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i.subject
-		title = i.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
+          end          
+	  title = i.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 	%>
 <div class="<%= classdiv %>">
 <h1><strong><%= link_to chapstr, issue_path(i.id) %>: </strong><%= title %></h1>
 <div class="<%= classdiv %>descr"><%= textilizable i, :description %></div>
 <% i.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i2| 
+          if (i2.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i2.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i2.subject
-		title = i2.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
+          end          
+	  title = i2.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
+
 	%>
 <div class="<%= classdiv %>">
 <h2><strong><%= link_to chapstr, issue_path(i2.id) %>: </strong><%= title %></h2>
 <div class="<%= classdiv %>descr"><%= textilizable i2, :description %></div>
 <% i2.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i3| 
+          if (i3.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i3.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i3.subject
-		title = i3.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
+          end          
+	  title = i3.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
+
 	%>
 <div class="<%= classdiv %>">
 <h3><strong><%= link_to chapstr, issue_path(i3.id) %>: </strong><%= title %></h3>
 <div class="<%= classdiv %>descr"><%= textilizable i3, :description %></div>
 <% i3.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i4| 
+          if (i4.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i4.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i4.subject
-		title = i4.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
+          end          
+	  title = i4.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 	%>
 <div class="<%= classdiv %>">
 <h4><strong><%= link_to chapstr, issue_path(i4.id) %>: </strong><%= title %></h4>
 <div class="<%= classdiv %>descr"><%= textilizable i4, :description %></div>
 <% i4.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i5| 
+          if (i5.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i5.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i5.subject
-		title = i5.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
+          end          
+	  title = i5.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 	%>
 <div class="<%= classdiv %>">
 <h5><strong><%= link_to chapstr, issue_path(i5.id) %>: </strong><%= title %></h5>
 <div class="<%= classdiv %>descr"><%= textilizable i5, :description %></div>
 <% i5.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i6| 
+          if (i6.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i6.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i6.subject
+          end          
 		title = i6.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
 	%>
 <div class="<%= classdiv %>">
 <h6><strong><%= link_to chapstr, issue_path(i6.id) %>: </strong><%= title %></h6>
 <div class="<%= classdiv %>descr"><%= textilizable i6, :description %></div>
 <% i6.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i7| 
+          if (i7.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i7.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i7.subject
+          end          
 		title = i7.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
 	%>
 <div class="<%= classdiv %>">
 <h7><strong><%= link_to chapstr, issue_path(i7.id) %>: </strong><%= title %></h7>
 <div class="<%= classdiv %>descr"><%= textilizable i7, :description %></div>
 <% i7.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i8| 
+          if (i8.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i8.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i8.subject
+          end          
 		title = i8.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
 	%>
 <div class="<%= classdiv %>">
 <h8><strong><%= link_to chapstr, issue_path(i8.id) %>: </strong><%= title %></h8>
 <div class="<%= classdiv %>descr"><%= textilizable i8, :description %></div>
 <% i8.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i9| 
+          if (i9.children.size >= 0) then 
+		classdiv = "ParentIssue"
+		chapstr = i9.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value
+		mychaps = chapstr.split("-") 
+		chapstr = mychaps[1]
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}
+		mychaps = chapstr.split(".") 
+		chapstr = ""
+		mychaps.each { |e| 
+			eint = e.to_i
+			chapstr += eint.to_s + "."
+		}                
+          else
+		classdiv = "Issue"
 		chapstr = i9.subject
+          end          
 		title = i9.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
 	%>
 <div class="<%= classdiv %>">
