@@ -23,7 +23,10 @@ td.description {
     margin-top: 5px;
 }
 
-.ParentIssue h2 h3 h4 h5 h6 h7 h8 h9{
+.ParentIssue h2, .ParentIssue h3,
+.ParentIssue h4, .ParentIssue h5,
+.ParentIssue h6, .ParentIssue h7,
+.ParentIssue h8, .ParentIssue h9{
     padding-left: 4px;
 }
 
