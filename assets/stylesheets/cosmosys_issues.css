@@ -6,7 +6,17 @@ td.description {
     font-weight: bold;
 }
 
-.IssueDoc {
+.IssueDoc .ParentIssue .Issue{
+    border: 1px solid darkgrey;
+    margin-left: 3px;
+    margin-top: 2px;
+}
+.ParentIssue{
+    border: 1px solid darkgrey;
+    margin-left: 3px;
+    margin-top: 2px;
+}
+.Issue{
     border: 1px solid darkgrey;
     margin-left: 3px;
     margin-top: 2px;
