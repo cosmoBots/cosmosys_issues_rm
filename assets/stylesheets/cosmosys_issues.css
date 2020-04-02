@@ -135,13 +135,13 @@ h6 {
   margin-top: 2.50em;
   margin-bottom: 2.50em;
   margin-left: 0;
-  margin-right: 0;
+  margin-right: 0;dd
   font-weight: bold;
 }
 
 .collapsible {
-  /* background-color: #777; 
-  color: white;*/
+  background-color: transparent; 
+  /*color: white;*/
   cursor: pointer;
   /* padding: 1px; */
   width: 100%;
@@ -149,11 +149,13 @@ h6 {
   text-align: right;
   outline: none;
   /*font-size: 8px;*/
+  margin-top: -4em;
 }
 
+/*
 .active, .collapsible:hover {
   background-color: #ddd;
-}
+} */
 
 .collapsible:after {
   content: '\002B';
