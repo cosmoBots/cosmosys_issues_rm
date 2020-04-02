@@ -50,23 +50,23 @@ td.description {
 }
 
 .Infodescr{
-	color: grey;
+  color: grey;
   font-style: italic;
-  padding: 0 18px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s ease-out;
-  background-color: #f1f1f1;  
-}
-
-.Issuedescr{
-	color: grey;
-  font-style: italic;
-  padding: 0 18px;
-  max-height: 0;
+  padding: 0 16px;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
   background-color: #f1f1f1;
+  margin-top: -2em; 
+}
+
+.Issuedescr{
+  color: grey;
+  font-style: italic;
+  padding: 0 16px;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+  margin-top: -2em;
 }
 
 h1 { 
@@ -140,15 +140,12 @@ h6 {
 }
 
 .collapsible {
-  background-color: transparent; 
-  /*color: white;*/
+  background-color: transparent;
   cursor: pointer;
-  /* padding: 1px; */
   width: 100%;
-  border: none;
+  border: hidden;
   text-align: right;
   outline: none;
-  /*font-size: 8px;*/
   margin-top: -4em;
 }
 
