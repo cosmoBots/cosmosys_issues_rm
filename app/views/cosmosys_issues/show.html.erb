@@ -31,7 +31,7 @@
 	%>
 <div class="<%= classdiv %>">
 <h1><strong><%= link_to chapstr, issue_path(i.id) %>: </strong><%= title %></h1>
-<button class="collapsible">Open Collapsible</button>
+<button class="collapsible"></button>
 <div class="<%= classdiv %>descr"><%= textilizable i, :description %></div>
 <% i.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i2| 
           if (i2.children.size >= 1) then 
@@ -60,7 +60,7 @@
 	%>
 <div class="<%= classdiv %>">
 <h2><strong><%= link_to chapstr, issue_path(i2.id) %>: </strong><%= title %></h2>
-<button class="collapsible">Open Collapsible</button>
+<button class="collapsible"></button>
 <div class="<%= classdiv %>descr"><%= textilizable i2, :description %></div>
 <% i2.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i3| 
           if (i3.children.size >= 1) then 
@@ -89,7 +89,7 @@
 	%>
 <div class="<%= classdiv %>">
 <h3><strong><%= link_to chapstr, issue_path(i3.id) %>: </strong><%= title %></h3>
-<button class="collapsible">Open Collapsible</button>
+<button class="collapsible"></button>
 <div class="<%= classdiv %>descr"><%= textilizable i3, :description %></div>
 <% i3.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i4| 
           if (i4.children.size >= 1) then 
@@ -117,7 +117,7 @@
 	%>
 <div class="<%= classdiv %>">
 <h4><strong><%= link_to chapstr, issue_path(i4.id) %>: </strong><%= title %></h4>
-<button class="collapsible">Open Collapsible</button>
+<button class="collapsible"></button>
 <div class="<%= classdiv %>descr"><%= textilizable i4, :description %></div>
 <% i4.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i5| 
           if (i5.children.size >= 1) then 
