@@ -29,12 +29,17 @@
           end          
 	  title = i.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 	%>
+
 <div class="<%= classdiv %>">
 <h1><strong><%= link_to chapstr, issue_path(i.id) %>: </strong><%= title %></h1>
 <% if i.description != nil and i.description.size > 0 then %>
-<button class="collapsible">Open Collapsible</button>
+<button class="collapsible"></button>
 <% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i, :description %></div>
+<% if i.children != nil and i.children.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
+<div>
 <% i.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i2| 
           if (i2.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -60,12 +65,17 @@
 	  title = i2.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 
 	%>
-<div class="<%= classdiv %>">
+
+	<div class="<%= classdiv %>">
 <h2><strong><%= link_to chapstr, issue_path(i2.id) %>: </strong><%= title %></h2>
 <% if i2.description != nil and i2.description.size > 0 then %>
-<button class="collapsible">Open Collapsible</button>
+<button class="collapsible"></button>
 <% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i2, :description %></div>
+<% if i2.children != nil and i2.children.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
+<div>
 <% i2.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i3| 
           if (i3.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -91,10 +101,18 @@
 	  title = i3.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 
 	%>
+
+	
 <div class="<%= classdiv %>">
 <h3><strong><%= link_to chapstr, issue_path(i3.id) %>: </strong><%= title %></h3>
-<button class="collapsible">Open Collapsible</button>
+<% if i3.description != nil and i3.description.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i3, :description %></div>
+<% if i3.children != nil and i3.children.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
+<div>
 <% i3.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i4| 
           if (i4.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -119,10 +137,18 @@
           end          
 	  title = i4.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 	%>
+
+	
 <div class="<%= classdiv %>">
 <h4><strong><%= link_to chapstr, issue_path(i4.id) %>: </strong><%= title %></h4>
+<% if i4.description != nil and i4.description.size > 0 then %>
 <button class="collapsible"></button>
+<% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i4, :description %></div>
+<% if i4.children != nil and i4.children.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
+<div>
 <% i4.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i5| 
           if (i5.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -147,9 +173,18 @@
           end          
 	  title = i5.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 	%>
+>
+
 <div class="<%= classdiv %>">
 <h5><strong><%= link_to chapstr, issue_path(i5.id) %>: </strong><%= title %></h5>
+<% if i5.description != nil and i5.description.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i5, :description %></div>
+<% if i5.children != nil and i5.children.size > 0 then %>
+<button class="collapsible"></button>
+<% end %
+<div>
 <% i5.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i6| 
           if (i6.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -174,9 +209,18 @@
           end          
 		title = i6.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
 	%>
+
+	
 <div class="<%= classdiv %>">
 <h6><strong><%= link_to chapstr, issue_path(i6.id) %>: </strong><%= title %></h6>
+<% if i6.description != nil and i6.description.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i6, :description %></div>
+<% if i6.children != nil and i6.children.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
+<div>
 <% i6.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i7| 
           if (i7.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -201,9 +245,18 @@
           end          
 		title = i7.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
 	%>
+
+	
 <div class="<%= classdiv %>">
 <h7><strong><%= link_to chapstr, issue_path(i7.id) %>: </strong><%= title %></h7>
+<% if i7.description != nil and i7.description.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i7, :description %></div>
+<% if i7.children != nil and i7.children.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
+<div>
 <% i7.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i8| 
           if (i8.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -228,9 +281,18 @@
           end          
 		title = i8.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
 	%>
+
+	
 <div class="<%= classdiv %>">
 <h8><strong><%= link_to chapstr, issue_path(i8.id) %>: </strong><%= title %></h8>
+<% if i8.description != nil and i8.description.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i8, :description %></div>
+<% if i8.children != nil and i8.children.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
+<div>
 <% i8.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i9| 
           if (i9.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -255,27 +317,43 @@
           end          
 		title = i9.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)	
 	%>
+	<% if i9.children != nil and i9.children.size > 0 then %>
+	<button class="collapsible"></button>
+	<% end %>
+	
 <div class="<%= classdiv %>">
 <h9><strong><%= link_to chapstr, issue_path(i9.id) %>: </strong><%= title %></h8>
+<% if i9.description != nil and i9.description.size > 0 then %>
+<button class="collapsible"></button>
+<% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i9, :description %></div>
 </div>
 <% } %>
 </div>
-<% } %>
 </div>
 <% } %>
 </div>
-<% } %>
 </div>
 <% } %>
+</div>
+</div>
+<% } %>
+</div>
+</div>
+<% } %>
+</div>
 </div>
 <% } %>	
 </div>
-<% } %>
 </div>
 <% } %>
 </div>
+</div>
 <% } %>
+</div>
+</div>
+<% } %>
+</div>
 </div>
 
 <%= javascript_include_tag 'collapsive', :plugin => 'cosmosys_issues' %>
