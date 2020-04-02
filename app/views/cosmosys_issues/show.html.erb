@@ -173,7 +173,6 @@
           end          
 	  title = i5.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 	%>
->
 
 <div class="<%= classdiv %>">
 <h5><strong><%= link_to chapstr, issue_path(i5.id) %>: </strong><%= title %></h5>
@@ -183,7 +182,7 @@
 <div class="<%= classdiv %>descr"><%= textilizable i5, :description %></div>
 <% if i5.children != nil and i5.children.size > 0 then %>
 <button class="collapsible"></button>
-<% end %
+<% end %>
 <div>
 <% i5.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i6| 
           if (i6.children.size >= 1) then 
@@ -328,7 +327,6 @@
 <% end %>
 <div class="<%= classdiv %>descr"><%= textilizable i9, :description %></div>
 </div>
-</div>
 <% } %>
 </div>
 </div>
@@ -354,6 +352,7 @@
 </div>
 </div>
 <% } %>
+</div>
 </div>
 
 <%= javascript_include_tag 'collapsive', :plugin => 'cosmosys_issues' %>
