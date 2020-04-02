@@ -39,7 +39,7 @@
 <% if i.children != nil and i.children.size > 0 then %>
 <button class="collapsible"></button>
 <% end %>
-<div>
+<div class="collapsive-content">
 <% i.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i2| 
           if (i2.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -75,7 +75,7 @@
 <% if i2.children != nil and i2.children.size > 0 then %>
 <button class="collapsible"></button>
 <% end %>
-<div>
+<div class="collapsive-content">
 <% i2.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i3| 
           if (i3.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -112,7 +112,7 @@
 <% if i3.children != nil and i3.children.size > 0 then %>
 <button class="collapsible"></button>
 <% end %>
-<div>
+<div class="collapsive-content">
 <% i3.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i4| 
           if (i4.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -148,7 +148,7 @@
 <% if i4.children != nil and i4.children.size > 0 then %>
 <button class="collapsible"></button>
 <% end %>
-<div>
+<div class="collapsive-content">
 <% i4.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i5| 
           if (i5.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -183,7 +183,7 @@
 <% if i5.children != nil and i5.children.size > 0 then %>
 <button class="collapsible"></button>
 <% end %>
-<div>
+<div class="collapsive-content">
 <% i5.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i6| 
           if (i6.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -219,7 +219,7 @@
 <% if i6.children != nil and i6.children.size > 0 then %>
 <button class="collapsible"></button>
 <% end %>
-<div>
+<div class="collapsive-content">
 <% i6.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i7| 
           if (i7.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -255,7 +255,7 @@
 <% if i7.children != nil and i7.children.size > 0 then %>
 <button class="collapsible"></button>
 <% end %>
-<div>
+<div class="collapsive-content">
 <% i7.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i8| 
           if (i8.children.size >= 1) then 
 		classdiv = "ParentIssue"
@@ -291,7 +291,7 @@
 <% if i8.children != nil and i8.children.size > 0 then %>
 <button class="collapsible"></button>
 <% end %>
-<div>
+<div class="collapsive-content">
 <% i8.children.sort_by{|obj| obj.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cfchapter.id).value}.each { |i9| 
           if (i9.children.size >= 1) then 
 		classdiv = "ParentIssue"
