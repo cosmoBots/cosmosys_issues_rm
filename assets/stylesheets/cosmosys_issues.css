@@ -32,6 +32,11 @@ td.description {
 
 .ParentIssuedescr {
     padding-left: 3px;
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    background-color: #f1f1f1;    
 }
 
 .Issue {
@@ -46,12 +51,22 @@ td.description {
 
 .Infodescr{
 	color: grey;
-	font-style: italic;
+  font-style: italic;
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;  
 }
 
 .IssueDocdescr{
 	color: grey;
-	font-style: italic;
+  font-style: italic;
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
 }
 
 h1 { 
