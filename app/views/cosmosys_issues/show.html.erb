@@ -29,6 +29,7 @@
           end          
 	  title = i.custom_values.find_by_custom_field_id(CosmosysIssuesBase.cftitle.id)
 	%>
+<button class="collapsible">Open Collapsible</button>
 <div class="<%= classdiv %>">
 <h1><strong><%= link_to chapstr, issue_path(i.id) %>: </strong><%= title %></h1>
 <div class="<%= classdiv %>descr"><%= textilizable i, :description %></div>
@@ -269,3 +270,5 @@
 </div>
 <% } %>
 </div>
+
+<%= javascript_include_tag 'collapsive', :plugin => 'cosmosys_issues' %>
