@@ -14,7 +14,7 @@ for (i = 0; i < coll.length; i++) {
     // We have to go up to recalculate the maxHeight of the 
     // ancestors
     done = false;
-    while (!done){
+    while (done == false){
         done = true;
         thisEl = content.parentNode;
         if (thisEl != null){
@@ -26,6 +26,7 @@ for (i = 0; i < coll.length; i++) {
                 }
             }
         }
+        content = thisEl;
     }
   });
 }
