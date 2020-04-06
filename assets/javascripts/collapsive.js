@@ -17,6 +17,7 @@ for (i = 0; i < coll.length; i++) {
     while (done == false){
         done = true;
         thisEl = content.parentNode;
+        thisEl.style.backgroundColor = "red";
         if (thisEl != null){
             butEl = thisEl.previousElementSibling;
             if (butEl != null) {
