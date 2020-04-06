@@ -8,8 +8,23 @@ for (i = 0; i < coll.length; i++) {
     if (content.style.maxHeight){
       content.style.maxHeight = null;
     } else {
-      //content.style.maxHeight = content.scrollHeight + "px";
-      content.style.maxHeight = 100%;
-    } 
+      content.style.maxHeight = content.scrollHeight + "px";
+    }
+    // We have to go up to recalculate the maxHeight of the 
+    // ancestors
+    done = false;
+    while (!done){
+        done = true;
+        thisEl = content.parentNode;
+        if (thisEl != null){
+            butEl = content.previousElementSibling;
+            if (butEl != null) {
+                if (butEl.className == "collapsible") {
+                    done = false;
+                    thisEl.style.maxHeight = thisEl.scrollHeight + "px";
+                }
+            }
+        }
+    }
   });
 }
