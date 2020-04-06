@@ -10,6 +10,7 @@ for (i = 0; i < coll.length; i++) {
     } else {
       content.style.maxHeight = content.scrollHeight + "px";
     }
+
     // We have to go up to recalculate the maxHeight of the 
     // ancestors
     done = false;
@@ -17,7 +18,7 @@ for (i = 0; i < coll.length; i++) {
         done = true;
         thisEl = content.parentNode;
         if (thisEl != null){
-            butEl = content.previousElementSibling;
+            butEl = thisEl.previousElementSibling;
             if (butEl != null) {
                 if (butEl.className == "collapsible") {
                     done = false;
