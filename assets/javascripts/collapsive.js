@@ -22,7 +22,7 @@ for (i = 0; i < coll.length; i++) {
             if (butEl != null) {
                 if (butEl.className == "collapsible") {
                     done = false;
-                    thisEl.style.maxHeight = thisEl.scrollHeight + "px";
+                    thisEl.style.maxHeight = null;
                 }
             }
         }
