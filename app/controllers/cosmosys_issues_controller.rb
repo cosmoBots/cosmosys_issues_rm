@@ -1,5 +1,5 @@
 class CosmosysIssuesController < ApplicationController
-  before_action :find_project, :authorize, :except => [:tree]
+  before_action :find_project, :authorize, :except => [:tree,:find_project]
 
   @@chapterdigits = 3
   @@cfchapter = IssueCustomField.find_by_name('IssChapter')
