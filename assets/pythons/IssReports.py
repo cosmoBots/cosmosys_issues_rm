@@ -307,8 +307,9 @@ data['issueslist'] = issueslist
 
 data['issuesclean'] = []
 data['byperson'] = {}
-
+versions_dict = {}
 for tk in data['targets']:
+    versions_dict[tk]={}
     t = data['targets'][tk]
     t['issues'] = []
     if 'start_date' in t.keys():
@@ -390,7 +391,7 @@ for r in issueslist:
                         personkey = "nobody"
                     if personkey not in data['byperson'].keys():
                         data['byperson'][personkey] = {}
-                        data['byperson'][personkey]['targets'] = {}
+                        data['byperson'][personkey]['targets'] = versions_dict
                         for p in periods:
                             data['byperson'][personkey]['targets'][p] = {}
                             data['byperson'][personkey]['targets'][p]['assigned'] = []
