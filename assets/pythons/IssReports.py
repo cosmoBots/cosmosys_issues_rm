@@ -278,7 +278,7 @@ if (len(sys.argv) > 5):
 if (tmpfilepath is None):
     import json,urllib.request
     urlfordata = root_url+"/cosmosys_issues/"+pr_id_str+".json?key="+issues_key_txt
-    print("urlfordata: ",urlfordata)
+    #print("urlfordata: ",urlfordata)
     datafromurl = urllib.request.urlopen(urlfordata).read().decode('utf-8')
     data = json.loads(datafromurl)
 
@@ -326,11 +326,11 @@ for tk in data['targets']:
 for r in issueslist:
     if 'start_date' in r.keys():
         if(r['start_date']):
-            print(r)
-            print(r['start_date'])
-            print(datetime.strptime(r['start_date'], '%Y-%m-%d'))
-            print(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp())
-            print(int(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp()))
+            #print(r)
+            #print(r['start_date'])
+            #print(datetime.strptime(r['start_date'], '%Y-%m-%d'))
+            #print(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp())
+            #print(int(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp()))
             r['start_date_int'] = int(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp())
     if 'due_date' in r.keys():
         if(r['due_date']):
@@ -396,13 +396,13 @@ for r in issueslist:
                             data['byperson'][personkey]['targets'][p] = {}
                             data['byperson'][personkey]['targets'][p]['assigned'] = []
                             data['byperson'][personkey]['targets'][p]['supervised'] = []
-                    print("*********************1")
-                    print(periods)
-                    print("*********************2")
-                    print(data['byperson'][personkey]['targets'].keys())                        
-                    print("*********************3")
-                    print(r)
-                    print("*********************4")
+                    #print("*********************1")
+                    #print(periods)
+                    #print("*********************2")
+                    #print(data['byperson'][personkey]['targets'].keys())                        
+                    #print("*********************3")
+                    #print(r)
+                    #print("*********************4")
                     for p in periods:
                         if (p not in data['byperson'][personkey]['targets'].keys()):
                             data['byperson'][personkey]['targets'][p] = {}
@@ -423,10 +423,10 @@ for r in issueslist:
                         data['byperson'][personkey]['targets'][p]['assigned'] = []
                         data['byperson'][personkey]['targets'][p]['supervised'] = []
                         
-                print("*********************")
-                print(periods)
-                print("*********************")
-                print(data['byperson'][personkey]['targets'].keys())
+                #print("*********************")
+                #print(periods)
+                #print("*********************")
+                #print(data['byperson'][personkey]['targets'].keys())
                 for p in periods:                            
                     if (p not in data['byperson'][personkey]['targets'].keys()):
                         data['byperson'][personkey]['targets'][p] = {}
@@ -600,10 +600,10 @@ datelim11 = int(datetime.strptime(data['targets'][period]['start_date'], '%Y-%m-
 datelim12 = int(datetime.strptime(data['targets'][period]['due_date'], '%Y-%m-%d').timestamp())
 datelim21 = int(datetime.strptime(data['targets'][nextPeriod]['start_date'], '%Y-%m-%d').timestamp())
 datelim22 = int(datetime.strptime(data['targets'][nextPeriod]['due_date'], '%Y-%m-%d').timestamp())
-print("Datelim11: ",data['targets'][period]['start_date']," ",datelim11)
-print("Datelim12: ",data['targets'][period]['due_date']," ",datelim12)
-print("Datelim21: ",data['targets'][nextPeriod]['start_date']," ",datelim21)
-print("Datelim22: ",data['targets'][nextPeriod]['due_date']," ",datelim22)
+#print("Datelim11: ",data['targets'][period]['start_date']," ",datelim11)
+#print("Datelim12: ",data['targets'][period]['due_date']," ",datelim12)
+#print("Datelim21: ",data['targets'][nextPeriod]['start_date']," ",datelim21)
+#print("Datelim22: ",data['targets'][nextPeriod]['due_date']," ",datelim22)
 
 
 success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path
