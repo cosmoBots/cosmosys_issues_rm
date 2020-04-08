@@ -391,7 +391,7 @@ for r in issueslist:
                     if personkey not in data['byperson'].keys():
                         data['byperson'][personkey] = {}
                         data['byperson'][personkey]['targets'] = {}
-                        for p in periods:
+                        for p in data['targets']:
                             data['byperson'][personkey]['targets'][p] = {}
                             data['byperson'][personkey]['targets'][p]['assigned'] = []
                             data['byperson'][personkey]['targets'][p]['supervised'] = []
@@ -417,7 +417,7 @@ for r in issueslist:
                 if personkey not in data['byperson'].keys():
                     data['byperson'][personkey] = {}
                     data['byperson'][personkey]['targets'] = {}
-                    for p in periods:
+                    for p in data['targets']:
                         data['byperson'][personkey]['targets'][p] = {}
                         data['byperson'][personkey]['targets'][p]['assigned'] = []
                         data['byperson'][personkey]['targets'][p]['supervised'] = []
