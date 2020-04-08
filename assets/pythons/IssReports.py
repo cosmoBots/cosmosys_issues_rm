@@ -417,7 +417,7 @@ for r in issueslist:
                     personkey = "nobody"
                 if personkey not in data['byperson'].keys():
                     data['byperson'][personkey] = {}
-                    data['byperson'][personkey]['targets'] = {}
+                    data['byperson'][personkey]['targets'] = versions_dict
                     for p in periods:
                         data['byperson'][personkey]['targets'][p] = {}
                         data['byperson'][personkey]['targets'][p]['assigned'] = []
