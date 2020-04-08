@@ -310,6 +310,8 @@ data['byperson'] = {}
 versions_dict = {}
 for tk in data['targets']:
     versions_dict[tk]={}
+    versions_dict[tk]['assigned'] = []
+    versions_dict[tk]['supervised'] = []
     t = data['targets'][tk]
     t['issues'] = []
     if 'start_date' in t.keys():
