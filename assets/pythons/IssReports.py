@@ -592,8 +592,8 @@ with open(reporting_path + '/doc/issues.json', 'w') as outfile:
 
 from Naked.toolshed.shell import execute_js
 
-period='5'
-nextPeriod='6'
+period='6'
+nextPeriod='7'
 
 datelim11 = int(datetime.strptime(data['targets'][period]['start_date'], '%Y-%m-%d').timestamp())
 datelim12 = int(datetime.strptime(data['targets'][period]['due_date'], '%Y-%m-%d').timestamp())
