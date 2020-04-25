@@ -133,6 +133,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
       treedata[:targets][v.id.to_s] = {}
       treedata[:targets][v.id.to_s][:name] = v.name
       treedata[:targets][v.id.to_s][:due_date] = v.due_date
+      treedata[:targets][v.id.to_s][:status] = v.status
       treedata[:targets][v.id.to_s][:start_date] = v.custom_values.find_by_custom_field_id(@@cfvstartdate.id).value
       treedata[:targets][v.id.to_s][:working_days] = v.custom_values.find_by_custom_field_id(@@cfvwd.id).value
     }
