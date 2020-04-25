@@ -308,8 +308,50 @@ data['issueslist'] = issueslist
 data['issuesclean'] = []
 data['byperson'] = {}
 
+lower_reporting_period = None
+upper_reporting_period = None
+lower_reporting_period_id = None
+upper_reporting_period_id = None
+
 for tk in data['targets']:
     t = data['targets'][tk]
+    if t['status'] == "open":
+        if lower_reporting_period is None:
+            # First open period
+            # The first is considered the first "lower"
+            lower_reporting_period = t
+            lower_reporting_period_id = tk
+        else:
+            if upper_reporting_period is None:
+                # Second open period
+                if t['due_date_int'] < lower_reporting_period['due_date_int']:
+                    # It is lower than the lowest, so this will be the new
+                    # lowest, and the previous lowest will be the second lowest
+                    upper_reporting_period = lower_reporting_period
+                    upper_reporting_period_id = lower_reporting_period_id
+                    lower_reporting_period = t
+                    lower_reporting_period_id = tk
+                else:
+                    # It is higher, so it is considered the second lowest
+                    upper_reporting_period = t
+                    upper_reporting_period_id = tk
+                
+            else:
+                # 3... open period
+                if t['due_date_int'] < lower_reporting_period['due_date_int']:
+                    # It is the new lowest, so the lowest will now be the 
+                    # second lowest
+                    upper_reporting_period = lower_reporting_period
+                    upper_reporting_period_id = lower_reporting_period_id
+                    lower_reporting_period = t
+                    lower_reporting_period_id = tk
+                else:
+                    if t['due_date_int'] < upper_reporting_period['due_date_int']:
+                        # It is not the lowest but the second lowest
+                        upper_reporting_period = t
+                        upper_reporting_period_id = tk
+
+
     t['issues'] = []
     if 'start_date' in t.keys():
         #print(t)
@@ -592,8 +634,9 @@ with open(reporting_path + '/doc/issues.json', 'w') as outfile:
 
 from Naked.toolshed.shell import execute_js
 
-period='6'
-nextPeriod='7'
+
+period = lower_reporting_period_id
+nextPeriod = upper_reporting_period_id
 
 datelim11 = int(datetime.strptime(data['targets'][period]['start_date'], '%Y-%m-%d').timestamp())
 datelim12 = int(datetime.strptime(data['targets'][period]['due_date'], '%Y-%m-%d').timestamp())
