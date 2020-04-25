@@ -315,6 +315,18 @@ upper_reporting_period_id = None
 
 for tk in data['targets']:
     t = data['targets'][tk]
+    t['issues'] = []
+    if 'start_date' in t.keys():
+        #print(t)
+        #print(t['start_date'])
+        #print(datetime.strptime(t['start_date'], '%Y-%m-%d'))
+        #print(datetime.strptime(t['start_date'], '%Y-%m-%d').timestamp())
+        #print(int(datetime.strptime(t['start_date'], '%Y-%m-%d').timestamp()))
+        t['start_date_int'] = int(datetime.strptime(t['start_date'], '%Y-%m-%d').timestamp())
+    if 'due_date' in t.keys():
+        t['due_date_int'] = int(datetime.strptime(t['due_date'], '%Y-%m-%d').timestamp())
+
+    # Lets know the reporting periods
     if t['status'] == "open":
         if lower_reporting_period is None:
             # First open period
@@ -350,18 +362,6 @@ for tk in data['targets']:
                         # It is not the lowest but the second lowest
                         upper_reporting_period = t
                         upper_reporting_period_id = tk
-
-
-    t['issues'] = []
-    if 'start_date' in t.keys():
-        #print(t)
-        #print(t['start_date'])
-        #print(datetime.strptime(t['start_date'], '%Y-%m-%d'))
-        #print(datetime.strptime(t['start_date'], '%Y-%m-%d').timestamp())
-        #print(int(datetime.strptime(t['start_date'], '%Y-%m-%d').timestamp()))
-        t['start_date_int'] = int(datetime.strptime(t['start_date'], '%Y-%m-%d').timestamp())
-    if 'due_date' in t.keys():
-        t['due_date_int'] = int(datetime.strptime(t['due_date'], '%Y-%m-%d').timestamp())
 
 
 for r in issueslist:
