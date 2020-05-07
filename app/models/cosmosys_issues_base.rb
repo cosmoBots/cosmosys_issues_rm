@@ -10,6 +10,11 @@ class CosmosysIssuesBase < ActiveRecord::Base
   @@max_graph_levels = 10
   @@max_graph_siblings = 6
   
+  def self.word_wrap( text, line_width: 80, break_sequence: "\n")
+    text.split("\n").collect! do |line|
+      line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1#{break_sequence}").rstrip : line
+    end * break_sequence
+  end
 
   def self.cfchapter
     @@cfchapter
@@ -182,7 +187,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
     end
     if not(force_end) then
       colorstr = 'black'
-      upn_node = cl.add_nodes( upn.id.to_s, :label => "{ "+upn.subject+"|"+upn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",
+      upn_node = cl.add_nodes( upn.id.to_s, :label => "{ "+upn.subject+"|"+word_wrap(upn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}",
         :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'record',
         :URL => root_url + "/issues/" + upn.id.to_s)
     else
@@ -225,7 +230,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
     end
     if not(force_end) then
       colorstr = 'black'
-      dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ "+dwn.subject+"|"+dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",
+      dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ "+dwn.subject+"|"+word_wrap(dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}",
         :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'record',
         :URL => root_url + "/issues/" + dwn.id.to_s)
     else
@@ -264,7 +269,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
       added_nodes = []
       desc.each { |e| 
         if (e.relations.size>0) then
-          labelstr = "{"+e.subject+"|"+e.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+          labelstr = "{"+e.subject+"|"+word_wrap(e.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
           e_node = cl.add_nodes(e.id.to_s, :label => labelstr,  
             :style => 'filled', :color => 'black', :fillcolor => 'grey', :shape => shapestr,
             :URL => root_url + "/issues/" + e.id.to_s)
@@ -283,7 +288,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
       return cl,torecalc
     else
       colorstr = 'black'
-      n_node = cl.add_nodes( n.id.to_s, :label => "{"+n.subject+"|"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",  
+      n_node = cl.add_nodes( n.id.to_s, :label => "{"+n.subject+"|"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}",  
         :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'record',
         :URL => root_url + "/issues/" + n.id.to_s)
       siblings_counter = 0
@@ -335,11 +340,11 @@ class CosmosysIssuesBase < ActiveRecord::Base
     colorstr = 'black'
     if upn.children.size > 0 then
       shapestr = "note"
-      labelstr = upn.subject+"\n----\n"+upn.custom_values.find_by_custom_field_id(@@cftitle.id).value
+      labelstr = upn.subject+"\n----\n"+word_wrap(upn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12)
       fontnamestr = 'times italic'            
     else
       shapestr = "record"
-      labelstr = "{"+upn.subject+"|"+upn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+      labelstr = "{"+upn.subject+"|"+word_wrap(upn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
       fontnamestr = 'times'
     end
     upn_node = cl.add_nodes( upn.id.to_s, :label => labelstr, :fontname => fontnamestr,
@@ -359,11 +364,11 @@ class CosmosysIssuesBase < ActiveRecord::Base
     colorstr = 'black'
     if dwn.children.size > 0 then
       shapestr = "note"
-      labelstr = dwn.subject+"\n----\n"+dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value
+      labelstr = dwn.subject+"\n----\n"+word_wrap(dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12)
       fontnamestr = 'times italic'            
     else
       shapestr = "record"
-      labelstr = "{"+dwn.subject+"|"+dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+      labelstr = "{"+dwn.subject+"|"+word_wrap(dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
       fontnamestr = 'times'
     end
     dwn_node = cl.add_nodes( dwn.id.to_s, :label => labelstr, :fontname => fontnamestr, 
@@ -384,11 +389,11 @@ class CosmosysIssuesBase < ActiveRecord::Base
     colorstr = 'black'
     if n.children.size > 0 then
       shapestr = "note"
-      labelstr = n.subject+"\n----\n"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value
+      labelstr = n.subject+"\n----\n"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12)
       fontnamestr = 'times italic'            
     else
       shapestr = "record"
-      labelstr = "{"+n.subject+"|"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+      labelstr = "{"+n.subject+"|"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
       fontnamestr = 'times'
     end
 
@@ -438,11 +443,11 @@ class CosmosysIssuesBase < ActiveRecord::Base
       colorstr = 'black'
       if n.children.size > 0 then
         shapestr = "note"
-        labelstr = n.subject+"\n----\n"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value
+        labelstr = n.subject+"\n----\n"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12)
         fontnamestr = 'times italic'            
       else
         shapestr = "record"
-        labelstr = "{"+n.subject+"|"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+        labelstr = "{"+n.subject+"|"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
         fontnamestr = 'times'
       end
       hn_node = hcl.add_nodes( n.id.to_s, :label => labelstr, :fontname => fontnamestr, 
