@@ -64,37 +64,44 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 			:field_format => 'string', :description => "Prefix for issue IDs",
 			:default_value => "TSK-", :is_for_all => true, :is_required => true)
 
+		rqidcounter = ProjectCustomField.create!(:name => 'IssCounter', 
+			:field_format => 'int', :searchable => false,
+			:description => 'Counter for generating identifiers',
+			:default_value => '1', :is_required => true, 
+			:is_filter => false, :visible => true,
+			:is_for_all => true)
+    
 		link_str = "link"
 
 		Issue.find_each{|i|
-				foundhie = false
-				founddep = false
-				i.custom_values.each{|cf|
-					if cf.custom_field_id == rqhiediaglink.id then
-						foundhie = true
-						cf.value = link_str
-						cf.save
-					end
-					if cf.custom_field_id == rqdepdiaglink.id then
-						founddep = true
-						cf.value = link_str
-						cf.save
-					end
-				}
-				if not foundhie then
-					icv = CustomValue.new
-					icv.custom_field = rqhiediaglink
-					icv.customized = i
-					icv.value = link_str
-					icv.save
-				end
-				if not founddep then
-					icv = CustomValue.new
-					icv.custom_field = rqdepdiaglink
-					icv.customized = i
-					icv.value = link_str
-					icv.save
-				end
+      foundhie = false
+      founddep = false
+      i.custom_values.each{|cf|
+        if cf.custom_field_id == rqhiediaglink.id then
+          foundhie = true
+          cf.value = link_str
+          cf.save
+        end
+        if cf.custom_field_id == rqdepdiaglink.id then
+          founddep = true
+          cf.value = link_str
+          cf.save
+        end
+      }
+      if not foundhie then
+        icv = CustomValue.new
+        icv.custom_field = rqhiediaglink
+        icv.customized = i
+        icv.value = link_str
+        icv.save
+      end
+      if not founddep then
+        icv = CustomValue.new
+        icv.custom_field = rqdepdiaglink
+        icv.customized = i
+        icv.value = link_str
+        icv.save
+      end
 		}
 		Project.find_each{|i|
 			foundhie = false
@@ -163,6 +170,10 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 		if (tmp != nil) then
 			tmp.destroy
 		end
+		tmp = ProjectCustomField.find_by_name('IssCounter')
+		if (tmp != nil) then
+			tmp.destroy
+		end    
 		drop_table :cosmosys_issue_bases
 	end
 end
