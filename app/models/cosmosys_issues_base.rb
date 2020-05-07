@@ -272,7 +272,6 @@ class CosmosysIssuesBase < ActiveRecord::Base
       }
       return cl,torecalc
     else
-      levels_counter += 1
       colorstr = 'black'
       n_node = cl.add_nodes( n.id.to_s, :label => "{"+n.subject+"|"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",  
         :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'record',
