@@ -7,7 +7,9 @@ class CosmosysIssuesBase < ActiveRecord::Base
   @@cfsupervisor = IssueCustomField.find_by_name('Supervisor')
   @@cfvstartdate = VersionCustomField.find_by_name('Start date')
   @@cfvwd = VersionCustomField.find_by_name('Working days')
-
+  @@max_graph_levels = 10
+  @@max_graph_siblings = 6
+  
 
   def self.cfchapter
     @@cfchapter
@@ -162,7 +164,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
       ch = n['children']
       chord = 1
       if (ch != nil) then
-         ch.each { |c| 
+        ch.each { |c| 
           update_node(c,node.id,nodechapter,chord)
           chord += 1
         }
@@ -172,15 +174,36 @@ class CosmosysIssuesBase < ActiveRecord::Base
 
   # -----------------------------------
 
-  def self.to_graphviz_depupn(cl,n_node,n,upn,isfirst,torecalc,root_url)
-    colorstr = 'black'
-    upn_node = cl.add_nodes( upn.id.to_s, :label => "{ "+upn.subject+"|"+upn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",
-      :style => 'filled', :color => 'black', :fillcolor => 'grey', :shape => 'record',
-      :URL => root_url + "/issues/" + upn.id.to_s)
+  def self.to_graphviz_depupn(cl,n_node,n,upn,isfirst,torecalc,root_url,levels_counter,force_end)
+    if not(force_end) then
+      colorstr = 'black'
+      upn_node = cl.add_nodes( upn.id.to_s, :label => "{ "+upn.subject+"|"+upn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",
+        :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => 'record',
+        :URL => root_url + "/issues/" + upn.id.to_s)
+    else
+      colorstr = 'blue'
+      upn_node = cl.add_nodes( upn.id.to_s, :label => "{ ... }",
+        :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => 'record',
+        :URL => root_url + "/issues/" + upn.id.to_s)
+      
+    end
     cl.add_edges(upn_node, n_node, :color => :blue)
-    upn.relations_to.each {|upn2|
-      cl,torecalc=self.to_graphviz_depupn(cl,upn_node,upn,upn2.issue_from,isfirst,torecalc,root_url)
-    }
+    if not (force_end) then
+      if (levels_counter < @@max_graph_levels) then
+        siblings_counter = 0
+        levels_counter += 1
+        upn.relations_to.each {|upn2|
+          if (siblings_counter < @@max_graph_siblings) then
+            cl,torecalc=self.to_graphviz_depupn(cl,upn_node,upn,upn2.issue_from,isfirst,torecalc,root_url,levels_counter,force_end)
+          else
+            if (siblings_counter <= @@max_graph_siblings) then
+              cl,torecalc=self.to_graphviz_depupn(cl,upn_node,upn,upn2.issue_from,isfirst,torecalc,root_url,levels_counter,true)
+            end
+          end
+          siblings_counter += 1
+        }
+      end
+    end
     if (isfirst) then
       torecalc[upn.id.to_s.to_sym] = upn.id
     end      
@@ -189,15 +212,35 @@ class CosmosysIssuesBase < ActiveRecord::Base
 
 
 
-  def self.to_graphviz_depdwn(cl,n_node,n,dwn,isfirst,torecalc,root_url)
+  def self.to_graphviz_depdwn(cl,n_node,n,dwn,isfirst,torecalc,root_url,levels_counter,force_end)
+    if not(force_end) then
       colorstr = 'black'
-    dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ "+dwn.subject+"|"+dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",
-      :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => 'record',
-      :URL => root_url + "/issues/" + dwn.id.to_s)
+      dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ "+dwn.subject+"|"+dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",
+        :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => 'record',
+        :URL => root_url + "/issues/" + dwn.id.to_s)
+    else
+      colorstr = 'blue'
+      dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ ... }",
+        :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => 'record',
+        :URL => root_url + "/issues/" + dwn.id.to_s)
+    end
     cl.add_edges(n_node, dwn_node, :color => :blue)
-    dwn.relations_from.each {|dwn2|
-      cl,torecalc=self.to_graphviz_depdwn(cl,dwn_node,dwn,dwn2.issue_to,isfirst,torecalc,root_url)
-    }
+    if not(force_end) then
+      if (levels_counter < @@max_graph_levels) then
+        levels_counter += 1
+        siblings_counter = 0
+        dwn.relations_from.each {|dwn2|
+          if (siblings_counter < @@max_graph_siblings) then
+            cl,torecalc=self.to_graphviz_depdwn(cl,dwn_node,dwn,dwn2.issue_to,isfirst,torecalc,root_url, levels_counter, force_end)
+          else
+            if (siblings_counter <= @@max_graph_siblings) then
+              cl,torecalc=self.to_graphviz_depdwn(cl,dwn_node,dwn,dwn2.issue_to,isfirst,torecalc,root_url, levels_counter, true)
+            end
+          end
+          siblings_counter += 1
+        }
+      end
+    end
     if (isfirst) then
       torecalc[dwn.id.to_s.to_sym] = dwn.id
     end  
@@ -206,38 +249,55 @@ class CosmosysIssuesBase < ActiveRecord::Base
 
   def self.to_graphviz_depcluster(cl,n,isfirst,torecalc,root_url)
     if ((n.children.size > 0)) then
-        shapestr = "record"
-        desc = self.get_descendents(n)
-        added_nodes = []
-        desc.each { |e| 
-          if (e.relations.size>0) then
-            labelstr = "{"+e.subject+"|"+e.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
-            e_node = cl.add_nodes(e.id.to_s, :label => labelstr,  
-              :style => 'filled', :color => 'black', :fillcolor => 'grey', :shape => shapestr,
-              :URL => root_url + "/issues/" + e.id.to_s)
-            e.relations_from.each {|r|
-              if (not(desc.include?(r.issue_to))) then
-                if (not(added_nodes.include?(r.issue_to))) then
-                  added_nodes.append(r.issue_to)
-                  ext_node = cl.add_nodes(r.issue_to.id.to_s,
-              :URL => root_url + "/issues/" + r.issue_to.id.to_s)
-                end
+      shapestr = "record"
+      desc = self.get_descendents(n)
+      added_nodes = []
+      desc.each { |e| 
+        if (e.relations.size>0) then
+          labelstr = "{"+e.subject+"|"+e.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}"      
+          e_node = cl.add_nodes(e.id.to_s, :label => labelstr,  
+            :style => 'filled', :color => 'black', :fillcolor => 'grey', :shape => shapestr,
+            :URL => root_url + "/issues/" + e.id.to_s)
+          e.relations_from.each {|r|
+            if (not(desc.include?(r.issue_to))) then
+              if (not(added_nodes.include?(r.issue_to))) then
+                added_nodes.append(r.issue_to)
+                ext_node = cl.add_nodes(r.issue_to.id.to_s,
+                  :URL => root_url + "/issues/" + r.issue_to.id.to_s)
               end
-              cl.add_edges(e_node, r.issue_to_id.to_s, :color => 'blue')
-            }
-          end          
-        }
-        return cl,torecalc
+            end
+            cl.add_edges(e_node, r.issue_to_id.to_s, :color => 'blue')
+          }
+        end          
+      }
+      return cl,torecalc
     else
+      levels_counter += 1
       colorstr = 'black'
       n_node = cl.add_nodes( n.id.to_s, :label => "{"+n.subject+"|"+n.custom_values.find_by_custom_field_id(@@cftitle.id).value + "}",  
         :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'record',
         :URL => root_url + "/issues/" + n.id.to_s)
+      siblings_counter = 0
       n.relations_from.each{|dwn|
-        cl,torecalc=self.to_graphviz_depdwn(cl,n_node,n,dwn.issue_to,isfirst,torecalc,root_url)
+        if (siblings_counter < @@max_graph_siblings) then
+          cl,torecalc=self.to_graphviz_depdwn(cl,n_node,n,dwn.issue_to,isfirst,torecalc,root_url,1,false)
+        else
+          if (siblings_counter <= @@max_graph_siblings) then
+            cl,torecalc=self.to_graphviz_depdwn(cl,n_node,n,dwn.issue_to,isfirst,torecalc,root_url,1,true)
+          end        
+        end        
+        siblings_counter += 1
       }
+      siblings_counter = 0
       n.relations_to.each{|upn|
-        cl,torecalc=self.to_graphviz_depupn(cl,n_node,n,upn.issue_from,isfirst,torecalc,root_url)
+        if (siblings_counter < @@max_graph_siblings) then
+          cl,torecalc=self.to_graphviz_depupn(cl,n_node,n,upn.issue_from,isfirst,torecalc,root_url,1,false)
+        else
+          if (siblings_counter <= @@max_graph_siblings) then
+            cl,torecalc=self.to_graphviz_depupn(cl,n_node,n,upn.issue_from,isfirst,torecalc,root_url,1,true)
+          end        
+        end        
+        siblings_counter += 1
       }
       return cl,torecalc
     end    
@@ -380,14 +440,14 @@ class CosmosysIssuesBase < ActiveRecord::Base
         :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => shapestr,
         :URL => root_url + "/issues/" + n.id.to_s)
       n.children.each{|c|
-          hcl.add_edges(hn_node, c.id.to_s)
+        hcl.add_edges(hn_node, c.id.to_s)
       }
       if (n.relations.size>0) then
         dn_node = dcl.add_nodes( n.id.to_s, :label => labelstr, :fontname => fontnamestr,   
           :style => 'filled', :color => colorstr, :fillcolor => 'grey', :shape => shapestr,
           :URL => root_url + "/issues/" + n.id.to_s)
         n.relations_from.each {|r|
-            dcl.add_edges(dn_node, r.issue_to_id.to_s, :color => 'blue')
+          dcl.add_edges(dn_node, r.issue_to_id.to_s, :color => 'blue')
         }
       end
     }
