@@ -62,7 +62,7 @@ class CreateCosmosysIssuesBases < ActiveRecord::Migration[5.2]
 
 		rqprefixfield = ProjectCustomField.create!(:name => 'IssPrefix', 
 			:field_format => 'string', :description => "Prefix for issue IDs",
-			:default_value => "TSK-", :is_for_all => true, :is_required => true)
+			:default_value => "TSK", :is_for_all => true, :is_required => true)
 
 		rqidcounter = ProjectCustomField.create!(:name => 'IssCounter', 
 			:field_format => 'int', :searchable => false,
