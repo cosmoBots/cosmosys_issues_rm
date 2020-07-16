@@ -67,5 +67,12 @@ if (use_mName == "0") {
 	fs.writeFileSync(pathRoot+'/doc/'+mName+'.ods', result);
 	});
 	
-
+    var tmpfile = new File(pathRoot + '/templates/prev_byperson_template.ods');
+    if (tmpfile.exists()) {
+        carbone.render(pathRoot + '/templates/prev_byperson_template.ods', data, options, function (err, result) {
+            if (err)
+                return console.log(err);
+            fs.writeFileSync(pathRoot + '/doc/' + mName + '_prev.ods', result);
+        });
+    }
 }
