@@ -188,12 +188,12 @@ class CosmosysIssuesBase < ActiveRecord::Base
     if not(force_end) then
       colorstr = 'black'
       upn_node = cl.add_nodes( upn.id.to_s, :label => "{ "+upn.subject+"|"+word_wrap(upn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}",
-        :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'record',
+        :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'Mrecord',
         :URL => root_url + "/issues/" + upn.id.to_s)
     else
       colorstr = 'blue'
       upn_node = cl.add_nodes( upn.id.to_s, :label => "{ ... }",
-        :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'record',
+        :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'Mrecord',
         :URL => root_url + "/issues/" + upn.id.to_s)
       
     end
@@ -229,14 +229,15 @@ class CosmosysIssuesBase < ActiveRecord::Base
       stylestr = 'filled'
     end
     if not(force_end) then
+
       colorstr = 'black'
       dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ "+dwn.subject+"|"+word_wrap(dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}",
-        :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'record',
+        :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'Mrecord',
         :URL => root_url + "/issues/" + dwn.id.to_s)
     else
       colorstr = 'blue'
       dwn_node = cl.add_nodes( dwn.id.to_s, :label => "{ ... }",
-        :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'record',
+        :style => stylestr, :color => colorstr, :fillcolor => 'grey', :shape => 'Mrecord',
         :URL => root_url + "/issues/" + dwn.id.to_s)
     end
     cl.add_edges(n_node, dwn_node, :color => :blue)
@@ -264,7 +265,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
 
   def self.to_graphviz_depcluster(cl,n,isfirst,torecalc,root_url)
     if ((n.children.size > 0)) then
-      shapestr = "record"
+      shapestr = 'Mrecord'
       desc = self.get_descendents(n)
       added_nodes = []
       desc.each { |e| 
@@ -285,11 +286,38 @@ class CosmosysIssuesBase < ActiveRecord::Base
           }
         end          
       }
+      colorstr = 'black'
+      n_node = cl.add_nodes( n.id.to_s, :label => "{"+n.subject+"|"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}",
+        :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'Mrecord',
+        :URL => root_url + "/issues/" + n.id.to_s)
+      siblings_counter = 0
+      n.relations_from.each{|dwn|
+        if (siblings_counter < @@max_graph_siblings) then
+          cl,torecalc=self.to_graphviz_depdwn(cl,n_node,n,dwn.issue_to,isfirst,torecalc,root_url,1,false)
+        else
+          if (siblings_counter <= @@max_graph_siblings) then
+            cl,torecalc=self.to_graphviz_depdwn(cl,n_node,n,dwn.issue_to,isfirst,torecalc,root_url,1,true)
+          end
+        end
+        siblings_counter += 1
+      }
+      siblings_counter = 0
+      n.relations_to.each{|upn|
+        if (siblings_counter < @@max_graph_siblings) then
+          cl,torecalc=self.to_graphviz_depupn(cl,n_node,n,upn.issue_from,isfirst,torecalc,root_url,1,false)
+        else
+          if (siblings_counter <= @@max_graph_siblings) then
+            cl,torecalc=self.to_graphviz_depupn(cl,n_node,n,upn.issue_from,isfirst,torecalc,root_url,1,true)
+          end
+        end
+        siblings_counter += 1
+      }
+
       return cl,torecalc
     else
       colorstr = 'black'
       n_node = cl.add_nodes( n.id.to_s, :label => "{"+n.subject+"|"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}",  
-        :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'record',
+        :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'Mrecord',
         :URL => root_url + "/issues/" + n.id.to_s)
       siblings_counter = 0
       n.relations_from.each{|dwn|
@@ -343,7 +371,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
       labelstr = upn.subject+"\n----\n"+word_wrap(upn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12)
       fontnamestr = 'times italic'            
     else
-      shapestr = "record"
+      shapestr = 'Mrecord'
       labelstr = "{"+upn.subject+"|"+word_wrap(upn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
       fontnamestr = 'times'
     end
@@ -367,7 +395,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
       labelstr = dwn.subject+"\n----\n"+word_wrap(dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12)
       fontnamestr = 'times italic'            
     else
-      shapestr = "record"
+      shapestr = 'Mrecord'
       labelstr = "{"+dwn.subject+"|"+word_wrap(dwn.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
       fontnamestr = 'times'
     end
@@ -392,7 +420,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
       labelstr = n.subject+"\n----\n"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12)
       fontnamestr = 'times italic'            
     else
-      shapestr = "record"
+      shapestr = 'Mrecord'
       labelstr = "{"+n.subject+"|"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
       fontnamestr = 'times'
     end
@@ -446,7 +474,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
         labelstr = n.subject+"\n----\n"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12)
         fontnamestr = 'times italic'            
       else
-        shapestr = "record"
+        shapestr = 'Mrecord'
         labelstr = "{"+n.subject+"|"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}"      
         fontnamestr = 'times'
       end
