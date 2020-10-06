@@ -46,7 +46,7 @@ variableStr  : '{#mId = '+mId+
 console.log('options: ', options);
 
 if (use_mName == "0") {
-	
+
 	carbone.render(pathRoot+'/templates/issues_template.odt', data, options, function(err, result){
 	if (err) return console.log(err);
 	fs.writeFileSync(pathRoot+'/doc/pr'+mName+'.odt', result);
@@ -56,16 +56,23 @@ if (use_mName == "0") {
 	if (err) return console.log(err);
 	fs.writeFileSync(pathRoot+'/doc/pr'+mName+'.ods', result);
 	});
+
 } else {
+
 	carbone.render(pathRoot+'/templates/issues_byperson_template.odt', data, options, function(err, result){
 	if (err) return console.log(err);
 	fs.writeFileSync(pathRoot+'/doc/'+mName+'.odt', result);
 	});
-	
+
 	carbone.render(pathRoot+'/templates/issues_byperson_template.ods', data, options, function(err, result){
 	if (err) return console.log(err);
 	fs.writeFileSync(pathRoot+'/doc/'+mName+'.ods', result);
 	});
 	
+        carbone.render(pathRoot + '/templates/prev_byperson_template.ods', data, options, function (err, result) {
+            if (err)
+                return console.log(err);
+            fs.writeFileSync(pathRoot + '/doc/' + mName + '_prev.ods', result);
+        });
 
 }
