@@ -286,9 +286,10 @@ class CosmosysIssuesBase < ActiveRecord::Base
           }
         end          
       }
+	if n.relations.size > 0 then
       colorstr = 'black'
-      n_node = cl.add_nodes( n.id.to_s, :label => "{"+n.subject+"|"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12) + "}",
-        :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'Mrecord',
+      n_node = cl.add_nodes( n.id.to_s, :label => n.subject+"\n----\n"+word_wrap(n.custom_values.find_by_custom_field_id(@@cftitle.id).value, line_width: 12),
+        :style => 'filled', :color => colorstr, :fillcolor => 'green', :shape => 'note',
         :URL => root_url + "/issues/" + n.id.to_s)
       siblings_counter = 0
       n.relations_from.each{|dwn|
@@ -312,7 +313,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
         end
         siblings_counter += 1
       }
-
+	end
       return cl,torecalc
     else
       colorstr = 'black'
