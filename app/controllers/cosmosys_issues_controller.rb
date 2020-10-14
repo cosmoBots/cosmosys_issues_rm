@@ -876,7 +876,12 @@ class CosmosysIssuesController < ApplicationController
     cftitlevalue = current_issue.custom_values.find_by_custom_field_id(@@cftitle.id).value
     cfchaptervalue = current_issue.custom_values.find_by_custom_field_id(@@cfchapter.id).value
     separator_idx = cfchaptervalue.rindex('-')
-    cfchapterarraywrapper = [cfchaptervalue.slice(0..separator_idx), cfchaptervalue.slice((separator_idx+1)..-1)]
+    if (separator_idx != nil) then
+        cfchapterarraywrapper = [cfchaptervalue.slice(0..separator_idx), cfchaptervalue.slice((separator_idx+1)..-1)]
+    else
+        cfchapterarraywrapper = ["Z", "Z"]
+    end
+
       #print(cfchapterarraywrapper)
       cfchapterstring = cfchapterarraywrapper[0]
       if (cfchapterarraywrapper[1] != nil) then 
