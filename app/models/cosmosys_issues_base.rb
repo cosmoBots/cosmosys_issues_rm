@@ -98,17 +98,17 @@ class CosmosysIssuesBase < ActiveRecord::Base
       roots = thisproject.issues.where(:parent => nil)
 	  if (include_subprojects) then
 	    thisproject.children.each{ |p|
-			roots + = self.get_subproject_root_issues(p)
+			roots += self.get_subproject_root_issues(p)
 		}
 	  end
 	  return roots
   end
 
   def self.show_as_json(thisproject, node_id,root_url)
-	return self.show_as_json(thisproject, node_id, root_url, false)
+	return self.show_as_json_inner(thisproject, node_id, root_url, false)
   end
 
-  def self.show_as_json(thisproject, node_id,root_url,include_subprojects)
+  def self.show_as_json_inner(thisproject, node_id,root_url,include_subprojects)
     require 'json'
 
     if (node_id != nil) then
