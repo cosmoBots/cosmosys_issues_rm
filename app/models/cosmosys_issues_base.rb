@@ -94,16 +94,28 @@ class CosmosysIssuesBase < ActiveRecord::Base
     return tree_node
   end
 
-
+  def self.get_project_root_issues(thisproject,include_subprojects)
+      roots = thisproject.issues.where(:parent => nil)
+	  if (include_subprojects) then
+	    thisproject.children.each{ |p|
+			roots + = self.get_subproject_root_issues(p)
+		}
+	  end
+	  return roots
+  end
 
   def self.show_as_json(thisproject, node_id,root_url)
+	return self.show_as_json(thisproject, node_id, root_url, false)
+  end
+
+  def self.show_as_json(thisproject, node_id,root_url,include_subprojects)
     require 'json'
 
     if (node_id != nil) then
-      thisnode = thisproject.issues.find(node_id)
+      thisnode = Issue.find(node_id)
       roots = [thisnode]
     else    
-      roots = thisproject.issues.where(:parent => nil)
+      roots = self.get_project_root_issues(thisproject,include_subprojects)
     end
 
     treedata = {}
