@@ -98,7 +98,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
       roots = thisproject.issues.where(:parent => nil)
 	  if (include_subprojects) then
 	    thisproject.children.each{ |p|
-			roots += self.get_project_root_issues(p)
+			roots += self.get_project_root_issues(p,include_subprojects)
 		}
 	  end
 	  return roots
