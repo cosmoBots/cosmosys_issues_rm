@@ -7,6 +7,7 @@ class CosmosysIssuesBase < ActiveRecord::Base
   @@cfsupervisor = IssueCustomField.find_by_name('Supervisor')
   @@cfvstartdate = VersionCustomField.find_by_name('Start date')
   @@cfvwd = VersionCustomField.find_by_name('Working days')
+  @@cfusgenrpt = UserCustomField.find_by_name('GenReport')
   @@max_graph_levels = 12
   @@max_graph_siblings = 7
   
@@ -146,7 +147,21 @@ class CosmosysIssuesBase < ActiveRecord::Base
       else
         treedata[:members][mb.user.login.to_s] = mb.user.attributes.slice("firstname","lastname")
         treedata[:members][mb.user.login.to_s][:class] = mb.user.class.name
-		treedata[:members][mb.user.login.to_s][:gen_report] = true
+		if (@@cfusgenrpt != nil) then
+			cv = mb.user.custom_values.find_by_custom_field_id(@@cfusgenrpt.id)
+			if (cv != nil) then
+				cvv = cv.value
+				if (cvv != nil) then
+					treedata[:members][mb.user.login.to_s][:gen_report] = cvv
+				else
+					treedata[:members][mb.user.login.to_s][:gen_report] = true
+				end
+			else
+				treedata[:members][mb.user.login.to_s][:gen_report] = true
+			end
+		else
+			treedata[:members][mb.user.login.to_s][:gen_report] = true
+		end
       end
     }
 
