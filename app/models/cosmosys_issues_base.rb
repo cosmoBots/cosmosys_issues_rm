@@ -152,7 +152,12 @@ class CosmosysIssuesBase < ActiveRecord::Base
 			if (cv != nil) then
 				cvv = cv.value
 				if (cvv != nil) then
-					treedata[:members][mb.user.login.to_s][:gen_report] = cvv
+					print("cvv: "+cvv+"\n")
+					if (cvv == '0') then
+						treedata[:members][mb.user.login.to_s][:gen_report] = false
+					else
+                                                treedata[:members][mb.user.login.to_s][:gen_report] = true
+					end
 				else
 					treedata[:members][mb.user.login.to_s][:gen_report] = true
 				end
