@@ -278,7 +278,7 @@ if (len(sys.argv) > 5):
 if (tmpfilepath is None):
     import json,urllib.request
     urlfordata = root_url+"/cosmosys_issues/"+pr_id_str+".json?key="+issues_key_txt
-    print("urlfordata: ",urlfordata)
+    #print("urlfordata: ",urlfordata)
     datafromurl = urllib.request.urlopen(urlfordata).read().decode('utf-8')
     data = json.loads(datafromurl)
 
@@ -367,11 +367,11 @@ for tk in data['targets']:
 for r in issueslist:
     if 'start_date' in r.keys():
         if(r['start_date']):
-            print(r)
-            print(r['start_date'])
-            print(datetime.strptime(r['start_date'], '%Y-%m-%d'))
-            print(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp())
-            print(int(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp()))
+            #print(r)
+            #print(r['start_date'])
+            #print(datetime.strptime(r['start_date'], '%Y-%m-%d'))
+            #print(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp())
+            #print(int(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp()))
             r['start_date_int'] = int(datetime.strptime(r['start_date'], '%Y-%m-%d').timestamp())
     if 'due_date' in r.keys():
         if(r['due_date']):
@@ -432,19 +432,23 @@ for r in issueslist:
                         personkey = "nobody"
                     if personkey not in data['byperson'].keys():
                         data['byperson'][personkey] = {}
-                        data['byperson'][personkey]['gen_report'] = data['members'][personkey]['gen_report']
+                        if personkey in data['members'].keys():
+                            data['byperson'][personkey]['gen_report'] = data['members'][personkey]['gen_report']
+                        else:
+                            data['byperson'][personkey]['gen_report'] = False
+
                         data['byperson'][personkey]['targets'] = {}
                         for p in data['targets']:
                             data['byperson'][personkey]['targets'][p] = {}
                             data['byperson'][personkey]['targets'][p]['assigned'] = []
                             data['byperson'][personkey]['targets'][p]['supervised'] = []
-                    print("*********************1")
-                    print(periods)
-                    print("*********************2")
-                    print(data['byperson'][personkey]['targets'].keys())                        
-                    print("*********************3")
-                    print(r)
-                    print("*********************4")
+                    #print("*********************1")
+                    #print(periods)
+                    #print("*********************2")
+                    #print(data['byperson'][personkey]['targets'].keys())                        
+                    #print("*********************3")
+                    #print(r)
+                    #print("*********************4")
                     for p in periods:
                         if (p not in data['byperson'][personkey]['targets'].keys()):
                             data['byperson'][personkey]['targets'][p] = {}
@@ -459,17 +463,21 @@ for r in issueslist:
                     personkey = "nobody"
                 if personkey not in data['byperson'].keys():
                     data['byperson'][personkey] = {}
-                    data['byperson'][personkey]['gen_report'] = data['members'][personkey]['gen_report']
+                    if personkey in data['members'].keys():
+                        data['byperson'][personkey]['gen_report'] = data['members'][personkey]['gen_report']
+                    else:
+                        data['byperson'][personkey]['gen_report'] = False
+
                     data['byperson'][personkey]['targets'] = {}
                     for p in data['targets']:
                         data['byperson'][personkey]['targets'][p] = {}
                         data['byperson'][personkey]['targets'][p]['assigned'] = []
                         data['byperson'][personkey]['targets'][p]['supervised'] = []
                         
-                print("*********************")
-                print(periods)
-                print("*********************")
-                print(data['byperson'][personkey]['targets'].keys())
+                #print("*********************")
+                #print(periods)
+                #print("*********************")
+                #print(data['byperson'][personkey]['targets'].keys())
                 for p in periods:                            
                     if (p not in data['byperson'][personkey]['targets'].keys()):
                         data['byperson'][personkey]['targets'][p] = {}
@@ -669,9 +677,10 @@ else:
 # js_command = 'node ' + file_path + " " + arguments
 #print(reqdocs.keys())
 
+print("INFORMES")
 for person in data['byperson'].keys():
-    print(person)
-    if (person['gen_report']):
+    print("Generando infome de ",person)
+    if (data['byperson'][person]['gen_report']):
         success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path
             + " " + person + " " + person + " "+"1"
             + " " + period + " " + nextPeriod
