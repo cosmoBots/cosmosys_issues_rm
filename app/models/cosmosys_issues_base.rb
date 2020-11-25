@@ -142,9 +142,11 @@ class CosmosysIssuesBase < ActiveRecord::Base
         treedata[:members][mb.principal.lastname.to_s][:firstname] = mb.principal.lastname
         treedata[:members][mb.principal.lastname.to_s][:lastname] = "group" 
         treedata[:members][mb.principal.lastname.to_s][:class] = mb.principal.class.name
+		treedata[:members][mb.principal.lastname.to_s][:gen_report] = false
       else
         treedata[:members][mb.user.login.to_s] = mb.user.attributes.slice("firstname","lastname")
         treedata[:members][mb.user.login.to_s][:class] = mb.user.class.name
+		treedata[:members][mb.principal.lastname.to_s][:gen_report] = true
       end
     }
 

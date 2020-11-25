@@ -432,6 +432,7 @@ for r in issueslist:
                         personkey = "nobody"
                     if personkey not in data['byperson'].keys():
                         data['byperson'][personkey] = {}
+                        data['byperson'][personkey]['gen_report'] = data['members'][personkey]['gen_report']
                         data['byperson'][personkey]['targets'] = {}
                         for p in data['targets']:
                             data['byperson'][personkey]['targets'][p] = {}
@@ -458,6 +459,7 @@ for r in issueslist:
                     personkey = "nobody"
                 if personkey not in data['byperson'].keys():
                     data['byperson'][personkey] = {}
+                    data['byperson'][personkey]['gen_report'] = data['members'][personkey]['gen_report']
                     data['byperson'][personkey]['targets'] = {}
                     for p in data['targets']:
                         data['byperson'][personkey]['targets'][p] = {}
@@ -669,22 +671,25 @@ else:
 
 for person in data['byperson'].keys():
     print(person)
-    success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path
-        + " " + person + " " + person + " "+"1"
-        + " " + period + " " + nextPeriod
-        + " " + str(datelim11) + " " + str(datelim12)
-        + " " + str(datelim21) + " " + str(datelim22)
-        )
-    #print(success)
+    if (person['gen_report']):
+        success = execute_js('./plugins/cosmosys_issues/assets/pythons/lib/launch_carbone.js', reporting_path
+            + " " + person + " " + person + " "+"1"
+            + " " + period + " " + nextPeriod
+            + " " + str(datelim11) + " " + str(datelim12)
+            + " " + str(datelim21) + " " + str(datelim22)
+            )
+        #print(success)
 
-    if success:
-        # handle success of the JavaScript
-        print("Todo fue bien")
+        if success:
+            # handle success of the JavaScript
+            print("Todo fue bien")
+
+        else:
+            # handle failure of the JavaScript
+            print("todo fue mal")
 
     else:
-        # handle failure of the JavaScript
-        print("todo fue mal")
-
+        print("skipping",person)
 # Vamos a generar el archivo JSON para crear el árbol
 
 # In[ ]:
